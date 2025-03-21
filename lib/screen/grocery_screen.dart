@@ -60,7 +60,7 @@ class _GroceryScreenState extends State<GroceryScreen> {
                   padding: const EdgeInsets.all(21.0),
                   child: Image.asset(
                     items[index]['image'],
-                    height: mqHeight * 0.13, color: AppColors.main,
+                    height: mqHeight * 0.10, color: AppColors.main,
                     fit: BoxFit.cover,
                   ),
                 ),

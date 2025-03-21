@@ -68,7 +68,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   ),
                   Text(
                     "Home",
-                    style: myTextStyle18(
+                    style: myTextStyle15(
                       fontColor:
                           _selectedIndex == 0 ? Colors.green : Colors.black54,
                       fontWeight:
@@ -88,7 +88,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 SizedBox(height: 20), // Space to align with FAB
                 Text(
                   "Add Item",
-                  style: myTextStyle18(
+                  style: myTextStyle15(
                     fontWeight: FontWeight.bold,
                     fontColor: Colors.black54,
                   ),
@@ -108,7 +108,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   ),
                   Text(
                     "List",
-                    style: myTextStyle18(
+                    style: myTextStyle15(
                       fontColor:
                           _selectedIndex == 1 ? Colors.green : Colors.black54,
                       fontWeight:

@@ -42,7 +42,12 @@ class _MyFilledButtonState extends State<MyOutlineButton> {
                 borderRadius: BorderRadius.circular(widget.borderRadius!))),
         child: Text(
           widget.btnText,
-          style: myTextStyle18(fontColor: widget.btnTextColor! , fontWeight: widget.textWeight! ),
+          style: TextStyle(
+            fontWeight: widget.textWeight,
+            fontFamily: "primary",
+            fontSize: widget.btnTextSize,
+            color: widget.btnTextColor,
+          ),
         ));
   }
 }
