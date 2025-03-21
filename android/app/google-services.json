@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "723249224931",
+    "project_id": "smartstore-fab0c",
+    "storage_bucket": "smartstore-fab0c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723249224931:android:b5d2f00bd6011e462a39d6",
+        "android_client_info": {
+          "package_name": "com.example.smartstock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCu5EMAZhHhj9BoHbYgi1kCUUnaapDJ7IM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

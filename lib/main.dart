@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smartstock/screen/dash_board_screen.dart';
+import 'package:smartstock/screen/home_screen.dart';
 import 'package:smartstock/screen/splash_screen.dart';
 
 void main() {
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SplashScreen()
+      home: DashBoardScreen()
     );
   }
 }
