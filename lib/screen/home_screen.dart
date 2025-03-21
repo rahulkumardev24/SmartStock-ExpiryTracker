@@ -43,8 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(getGreeting() , style: myTextStyle12(),),
           Text("Rahul kumar Sahu " , style: myTextStyle18(fontWeight: FontWeight.bold),),
         ],
-      )),
-
+      ) ,
+        backgroundColor: Colors.white,
+      ),
+   backgroundColor: Colors.white,
       body: Column(
         children: [
           /// Custom Tab Bar
