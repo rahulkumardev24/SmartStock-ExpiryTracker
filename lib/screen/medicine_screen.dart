@@ -11,18 +11,15 @@ class MedicineScreen extends StatefulWidget {
 
 class _MedicalScreenState extends State<MedicineScreen> {
   List<Map<String, dynamic>> items = [
-    {"image": "assets/images/medicine.png", "title": "Medicines"},
+    {"image": "assets/images/medicine (1).png", "title": "Medicines"},
     {"image": "assets/images/syrup.png", "title": "Syrups"},
-    {"image": "assets/images/injection.png", "title": "Injections"},
+    {"image": "assets/images/medical.png", "title": "Injections"},
     {"image": "assets/images/bandage.png", "title": "First Aid"},
-    {"image": "assets/images/thermometer.png", "title": "Thermometers"},
+    {"image": "assets/images/medical (1).png", "title": "Thermometers"},
     {"image": "assets/images/mask.png", "title": "Face Masks"},
     {"image": "assets/images/gloves.png", "title": "Gloves"},
-    {"image": "assets/images/sanitizer.png", "title": "Sanitizers"},
-    {"image": "assets/images/vitamins.png", "title": "Vitamins"},
-    {"image": "assets/images/pain-relief.png", "title": "Pain Relief"},
-    {"image": "assets/images/eye-drops.png", "title": "Eye Drops"},
-    {"image": "assets/images/health-monitor.png", "title": "Health Monitors"},
+    {"image": "assets/images/hand-soap.png", "title": "Sanitizers"},
+    {"image": "assets/images/eye-dropper.png", "title": "Eye Drops"},
   ];
 
   @override
