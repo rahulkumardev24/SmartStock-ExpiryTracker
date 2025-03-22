@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smartstock/constant/app_constant.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 
@@ -10,32 +11,20 @@ class MedicineScreen extends StatefulWidget {
 }
 
 class _MedicalScreenState extends State<MedicineScreen> {
-  List<Map<String, dynamic>> items = [
-    {"image": "assets/images/medicine (1).png", "title": "Medicines"},
-    {"image": "assets/images/syrup.png", "title": "Syrups"},
-    {"image": "assets/images/medical.png", "title": "Injections"},
-    {"image": "assets/images/bandage.png", "title": "First Aid"},
-    {"image": "assets/images/medical (1).png", "title": "Thermometers"},
-    {"image": "assets/images/mask.png", "title": "Face Masks"},
-    {"image": "assets/images/gloves.png", "title": "Gloves"},
-    {"image": "assets/images/hand-soap.png", "title": "Sanitizers"},
-    {"image": "assets/images/eye-dropper.png", "title": "Eye Drops"},
-  ];
-
   @override
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: GridView.builder(
-        itemCount: items.length,
+        itemCount: AppConstant.itemsMed.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 11,
           crossAxisSpacing: 11,
         ),
         itemBuilder: (context, index) {
+          var itemMedicine = AppConstant.itemsMed[index];
           return Column(
             children: [
               const SizedBox(height: 12),
@@ -54,7 +43,7 @@ class _MedicalScreenState extends State<MedicineScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(21.0),
                   child: Image.asset(
-                    items[index]['image'],
+                    itemMedicine['image'],
                     height: mqHeight * 0.10,
                     color: AppColors.main,
                     fit: BoxFit.cover,
@@ -62,7 +51,7 @@ class _MedicalScreenState extends State<MedicineScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(items[index]['title'], style: myTextStyle18()),
+              Text(itemMedicine['title'], style: myTextStyle18()),
             ],
           );
         },

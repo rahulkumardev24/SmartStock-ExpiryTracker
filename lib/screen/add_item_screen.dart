@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:smartstock/constant/app_constant.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/widgets/my_filled_button.dart';
@@ -22,24 +23,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _purchaseDateController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
-  final TextEditingController _itemNameController = TextEditingController() ;
+  final TextEditingController _itemNameController = TextEditingController();
   String? selectedImage;
+  String selectedCategoryType = "";
   String selectedItemType = "";
-  List<String> itemTypes = [
-    "Drink",
-    "Medicine",
-    "Dairy Product",
-    "Bakery",
-    "Frozen Food",
-    "Snacks",
-    "Fruits & Vegetables",
-    "Meat & Poultry",
-    "Seafood",
-    "Cooking Oil",
-    "Spices",
-    "Pet Supplies",
-    "Other",
-  ];
 
   /// Custom Date Picker using Bottom Sheet
   Future<void> _showCustomDatePicker(TextEditingController controller) async {
@@ -59,7 +46,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   "Select Date",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: myTextStyle18(fontWeight: FontWeight.bold),
                 ),
               ),
               const Divider(),
@@ -83,28 +70,29 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                   MyOutlineButton(btnText: 'Cancel',
-                     onPressed: () {
-                       Navigator.pop(context);
-                   },
-                     btnTextSize: 15,
-                     btnBackground: Colors.white,
-                     btnTextColor: Colors.black45,
-                     borderColor: Colors.black45,
-                   ),
-                   MyFilledButton(btnText: 'Confirm date',
-                     onPressed: () {
-                       setState(() {
-                         controller.text = DateFormat(
-                           'dd MMM yyyy',
-                         ).format(selectedDate);
-                       });
-                       Navigator.pop(context);
-
-                   },
-                     btnBackground: AppColors.main,
-                     btnTextSize: 15,
-                   ),
+                    MyOutlineButton(
+                      btnText: 'Cancel',
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      btnTextSize: 15,
+                      btnBackground: Colors.white,
+                      btnTextColor: Colors.black45,
+                      borderColor: Colors.black45,
+                    ),
+                    MyFilledButton(
+                      btnText: 'Confirm date',
+                      onPressed: () {
+                        setState(() {
+                          controller.text = DateFormat(
+                            'dd MMM yyyy',
+                          ).format(selectedDate);
+                        });
+                        Navigator.pop(context);
+                      },
+                      btnBackground: AppColors.main,
+                      btnTextSize: 15,
+                    ),
                   ],
                 ),
               ),
@@ -127,16 +115,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
           height: MediaQuery.of(context).size.height * 0.25,
           child: Column(
             children: [
-               Text(
-                "Select Image Source",
-                style: myTextStyle18(),
-              ),
+              Text("Select Image Source", style: myTextStyle18()),
               const Divider(),
 
               /// Option: Pick from Camera
               ListTile(
                 leading: const Icon(Icons.camera_alt, color: Colors.blue),
-                title:  Text("Take a photo" , style: myTextStyle15(),),
+                title: Text("Take a photo", style: myTextStyle15()),
                 onTap: () {
                   Navigator.pop(context);
                   _imagePick(ImageSource.camera);
@@ -146,7 +131,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
               /// Option: Pick from Gallery
               ListTile(
                 leading: const Icon(Icons.photo_library, color: Colors.green),
-                title:  Text("Choose from gallery" , style: myTextStyle15(),),
+                title: Text("Choose from gallery", style: myTextStyle15()),
                 onTap: () {
                   Navigator.pop(context);
                   _imagePick(ImageSource.gallery);
@@ -183,13 +168,16 @@ class _AddItemScreenState extends State<AddItemScreen> {
           child: MyNavigationButton(
             btnIcon: Icons.arrow_back_ios_rounded,
             btnBackground: Colors.black12,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
         ),
         title: Text("Add new item", style: myTextStyle24()),
         centerTitle: true,
       ),
       backgroundColor: Colors.white,
+
       /// ------ body ----- ///
       body: SingleChildScrollView(
         child: Padding(
@@ -207,70 +195,79 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     borderRadius: BorderRadius.circular(12),
                     color: AppColors.secondary.withAlpha(90),
                   ),
-                  child: selectedImage == null
-                      ? const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Icon(
-                        Icons.add_a_photo_outlined,
-                        size: 100,
-                        color: Colors.black45,
-                      ),
-                    ),
-                  )
-                      : ClipRRect(
-                    borderRadius: BorderRadius.circular(12), // Add rounded corners
-                    child: Image.file(
-                      File(selectedImage!),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  child:
+                      selectedImage == null
+                          ? const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Icon(
+                                Icons.add_a_photo_outlined,
+                                size: 100,
+                                color: Colors.black45,
+                              ),
+                            ),
+                          )
+                          : ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              12,
+                            ), // Add rounded corners
+                            child: Image.file(
+                              File(selectedImage!),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                 ),
               ),
-        
-              const SizedBox(width: 12),
-             /// item name
+
+              const SizedBox(height: 21),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Fill Details",
+                    style: myTextStyle18(
+                      fontColor: Colors.black45,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+              /// item name
               _buildInfoField("Item Name", _itemNameController),
 
               /// Quantity
               _buildInfoField("Quantity", _quantityController),
 
               /// Item Type
-              _buildDropdownField("Item type") ,
-        
+              _buildCategoryDropdownField("Item Categories"),
 
-        
+              /// Item Categories
+              _buildItemTypeDropdownField("Item Type"),
+
               /// Purchase Date (Custom Date Picker)
               _buildDatePickerField("Purchased Date", _purchaseDateController),
-        
+
               /// Expiry Date (Custom Date Picker)
               _buildDatePickerField("Expires on", _expiryDateController),
-        
-              const SizedBox(height: 10),
-              const Text(
-                "*Please confirm or change the expiry date as mentioned on the item!",
-                style: TextStyle(fontSize: 12, color: Colors.black54),
-              ),
 
-        
+              const SizedBox(height: 10),
+              Text(
+                "*Please confirm or change the expiry date as mentioned on the item!",
+                style: myTextStyle12(fontColor: Colors.black54),
+              ),
+              SizedBox(height: 12),
+
               /// Add Item Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
+                child: MyFilledButton(
+                  btnText: "+ Add this item",
+                  btnBackground: AppColors.main,
+                  borderRadius: 8,
 
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "Add this item",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  /// here we add items
+                  onPressed: () {},
                 ),
               ),
             ],
@@ -285,7 +282,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(8),
@@ -294,18 +291,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
+            Text(label, style: myTextStyle15(fontWeight: FontWeight.w500)),
             Expanded(
               child: TextField(
                 controller: controller,
                 textAlign: TextAlign.end,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Enter here",
-                  hintStyle: TextStyle(color: Colors.black45),
+                  hintStyle: myTextStyle15(fontColor: Colors.black45),
                 ),
               ),
             ),
@@ -329,17 +323,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
+            Text(label, style: myTextStyle15(fontWeight: FontWeight.w500)),
             GestureDetector(
               onTap: () => _showCustomDatePicker(controller),
               child: Row(
                 children: [
                   Text(
                     controller.text.isEmpty ? "Select date" : controller.text,
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                    style: myTextStyle15(fontColor: Colors.black54),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
@@ -356,8 +347,157 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
+  Widget _buildCategoryDropdownField(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: InkWell(
+          onTap: _showItemCategoriesBottomSheet, // Corrected method call
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label, style: myTextStyle15(fontWeight: FontWeight.w500)),
+              Row(
+                children: [
+                  Text(
+                    selectedCategoryType.isEmpty
+                        ? "Select"
+                        : selectedCategoryType,
+                    style: myTextStyle15(
+                      fontColor:
+                          selectedCategoryType.isEmpty
+                              ? Colors.black45
+                              : Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.black45,
+                    size: 24,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showItemCategoriesBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.35,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Select Item Category",
+                style: myTextStyle18(fontWeight: FontWeight.bold),
+              ),
+              const Divider(),
+              const SizedBox(height: 11),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategoryType = "Grocery";
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color:
+                            selectedCategoryType == "Grocery"
+                                ? AppColors.secondary
+                                : Colors.white,
+                        border: Border.all(
+                          width: 2,
+                          color:
+                              selectedCategoryType == "Grocery"
+                                  ? AppColors.secondary
+                                  : Colors.black45,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              "assets/icons/shopping-bag.png",
+                              height: MediaQuery.of(context).size.height * 0.15,
+                            ),
+                            Text("Grocery", style: myTextStyle18()),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategoryType = "Medicine";
+                      });
+                      Navigator.pop(context); // Close bottom sheet
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color:
+                            selectedCategoryType == "Medicine"
+                                ? AppColors.secondary
+                                : Colors.white,
+                        border: Border.all(
+                          width: 2,
+                          color:
+                              selectedCategoryType == "Medicine"
+                                  ? AppColors.secondary
+                                  : Colors.black45,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Image.asset(
+                              "assets/icons/syringe (1).png",
+                              height: MediaQuery.of(context).size.height * 0.15,
+                            ),
+                            Text("Medicine", style: myTextStyle18()),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   /// Custom Widget for Dropdown using Bottom Sheet
-  Widget _buildDropdownField(String label) {
+  Widget _buildItemTypeDropdownField(String label) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Container(
@@ -372,21 +512,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              Text(label, style: myTextStyle15(fontWeight: FontWeight.w500)),
               Row(
                 children: [
                   Text(
-                    selectedItemType ?? "Select item type",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color:
-                          selectedItemType == null
+                    selectedItemType.isEmpty ? "Select" : selectedItemType,
+                    style: myTextStyle15(
+                      fontColor:
+                          selectedCategoryType.isEmpty
                               ? Colors.black45
                               : Colors.black,
                     ),
@@ -410,41 +543,78 @@ class _AddItemScreenState extends State<AddItemScreen> {
   void _showItemTypeBottomSheet() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16),
-          height: 400,
+          height: MediaQuery.of(context).size.height * 0.5,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Select Item Type",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: myTextStyle15(fontWeight: FontWeight.bold),
               ),
               const Divider(),
 
               /// List of item types
               Expanded(
-                child: ListView.builder(
-                  itemCount: itemTypes.length,
+                child: GridView.builder(
+                  itemCount: AppConstant.items.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(itemTypes[index]),
-                      trailing:
-                          selectedItemType == itemTypes[index]
-                              ? const Icon(Icons.check, color: Colors.green)
-                              : null,
-                      onTap: () {
-                        setState(() {
-                          selectedItemType = itemTypes[index];
-                        });
-                        Navigator.pop(context);
-                      },
+                    var myItems = AppConstant.items[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectedItemType = myItems['title'];
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              width: 2,
+                              color:
+                                  selectedItemType == myItems['title']
+                                      ? AppColors.secondary
+                                      : Colors.black45,
+                            ),
+                            color:
+                                selectedItemType == myItems['title']
+                                    ? AppColors.secondary
+                                    : Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Image.asset(
+                                  myItems['image'],
+                                  color: AppColors.main,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                  fit: BoxFit.cover,
+                                ),
+
+                                Text(myItems['title'], style: myTextStyle12()),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     );
                   },
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    childAspectRatio: 3 / 4,
+                  ),
                 ),
               ),
             ],
@@ -453,6 +623,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       },
     );
   }
+
   @override
   void dispose() {
     super.dispose();
