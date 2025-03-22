@@ -358,7 +358,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
           border: Border.all(color: Colors.grey.shade300),
         ),
         child: InkWell(
-          onTap: _showItemCategoriesBottomSheet, // Corrected method call
+          onTap: _showItemCategoriesBottomSheet,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -508,7 +508,30 @@ class _AddItemScreenState extends State<AddItemScreen> {
           border: Border.all(color: Colors.grey.shade300),
         ),
         child: InkWell(
-          onTap: () => _showItemTypeBottomSheet(),
+          onTap: () {
+            if (selectedCategoryType.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "First select a category",
+                    style: myTextStyle18(fontColor: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                  action: SnackBarAction(
+                    label: "OK",
+                    textColor: Colors.white,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
+                  ),
+                ),
+              );
+            } else {
+              // Open item type selection if category is selected
+              _showItemTypeBottomSheet();
+            }
+          },
+
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -563,9 +586,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
               /// List of item types
               Expanded(
                 child: GridView.builder(
-                  itemCount: AppConstant.items.length,
+                  itemCount:
+                      selectedCategoryType == "Grocery"
+                          ? AppConstant.items.length
+                          : AppConstant.itemsMed.length,
                   itemBuilder: (context, index) {
-                    var myItems = AppConstant.items[index];
+                    var myItems =
+                        selectedCategoryType == "Grocery"
+                            ? AppConstant.items[index]
+                            : AppConstant.itemsMed[index];
                     return Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: InkWell(
