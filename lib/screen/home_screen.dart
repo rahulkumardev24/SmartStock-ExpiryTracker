@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:smartstock/models/item_model.dart';
+import 'package:smartstock/screen/notification_screen.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
+import 'package:smartstock/widgets/my_navigation_button.dart';
+import 'package:smartstock/widgets/notification_badge.dart';
 
 import 'grocery_screen.dart';
 import 'medicine_screen.dart';
@@ -34,19 +41,77 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  int _getExpiringItemsCount() {
+    final box = Hive.box<Item>('items');
+    return box.values.where((item) {
+      try {
+        final expiry = DateFormat('dd MMM yyyy').parse(item.expiryDate);
+        final now = DateTime.now();
+        final difference = expiry.difference(now).inDays;
+        return difference <= 2 && difference >= 0;
+      } catch (e) {
+        return false;
+      }
+    }).length;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final mqHeight = MediaQuery.of(context).size.height;
+    final mqWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(getGreeting() , style: myTextStyle12(),),
-          Text("Rahul kumar Sahu " , style: myTextStyle18(fontWeight: FontWeight.bold),),
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(getGreeting(), style: myTextStyle12()),
+            Text(
+              "Rahul kumar Sahu ",
+              style: myTextStyle18(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        actions: [
+          ValueListenableBuilder(
+            valueListenable: Hive.box<Item>('items').listenable(),
+            builder: (context, box, _) {
+              final count = _getExpiringItemsCount();
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  SizedBox(
+                    width: mqWidth * 0.11,
+                    height: mqWidth * 0.11,
+                    child: MyNavigationButton(
+                      btnIcon: FontAwesomeIcons.bell,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotificationScreen(),
+                          ),
+                        );
+                      },
+                      iconSize: 21,
+                      btnRadius: 100,
+                      btnBackground: AppColors.primary,
+                    ),
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: NotificationBadge(count: count),
+                    ),
+                ],
+              );
+            },
+          ),
+          SizedBox(width: 12),
         ],
-      ) ,
         backgroundColor: Colors.white,
       ),
-   backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           /// Custom Tab Bar

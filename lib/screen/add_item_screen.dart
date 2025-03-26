@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:smartstock/constant/app_constant.dart';
+import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/widgets/my_filled_button.dart';
@@ -12,14 +13,20 @@ import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'package:smartstock/widgets/my_outline_button.dart';
 
 class AddItemScreen extends StatefulWidget {
-  const AddItemScreen({super.key});
+  final String? prefilledCategory;
+  final String? prefilledItemType;
+
+  const AddItemScreen({
+    super.key,
+    this.prefilledCategory,
+    this.prefilledItemType,
+  });
 
   @override
   State<AddItemScreen> createState() => _AddItemScreenState();
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
-  final TextEditingController _itemTypeController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _purchaseDateController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
@@ -28,10 +35,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
   String selectedCategoryType = "";
   String selectedItemType = "";
 
+  @override
+  void initState() {
+    super.initState();
+    selectedCategoryType = widget.prefilledCategory ?? "";
+    selectedItemType = widget.prefilledItemType ?? "";
+  }
+
   /// Custom Date Picker using Bottom Sheet
   Future<void> _showCustomDatePicker(TextEditingController controller) async {
     DateTime selectedDate = DateTime.now();
     await showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -72,6 +87,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   children: [
                     MyOutlineButton(
                       btnText: 'Cancel',
+                      borderRadius: 8,
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -82,6 +98,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     ),
                     MyFilledButton(
                       btnText: 'Confirm date',
+                      borderRadius: 8,
                       onPressed: () {
                         setState(() {
                           controller.text = DateFormat(
@@ -153,6 +170,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
         selectedImage = pickedImage.path;
       });
     }
+  }
+
+  void mySnackBar({required String message, Color? backgroundColor}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message , style: myTextStyle18(fontColor: Colors.white),), backgroundColor: backgroundColor),
+    );
   }
 
   @override
@@ -240,10 +263,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
               _buildInfoField("Quantity", _quantityController),
 
               /// Item Type
-              _buildCategoryDropdownField("Item Categories"),
+              if (widget.prefilledCategory == null)
+                _buildCategoryDropdownField("Item Categories"),
 
               /// Item Categories
-              _buildItemTypeDropdownField("Item Type"),
+              if (widget.prefilledItemType == null)
+                _buildItemTypeDropdownField("Item Type"),
 
               /// Purchase Date (Custom Date Picker)
               _buildDatePickerField("Purchased Date", _purchaseDateController),
@@ -267,7 +292,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   borderRadius: 8,
 
                   /// here we add items
-                  onPressed: () {},
+                  onPressed: _saveItem,
                 ),
               ),
             ],
@@ -653,10 +678,47 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
+  /// Save item to Hive database
+  Future<void> _saveItem() async {
+    if (_itemNameController.text.isEmpty ||
+        _quantityController.text.isEmpty ||
+        _purchaseDateController.text.isEmpty ||
+        _expiryDateController.text.isEmpty ||
+        selectedCategoryType.isEmpty ||
+        selectedItemType.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    final item = Item(
+      itemName: _itemNameController.text,
+      quantity: _quantityController.text,
+      purchaseDate: _purchaseDateController.text,
+      expiryDate: _expiryDateController.text,
+      imagePath: selectedImage,
+      categoryType: selectedCategoryType,
+      itemType: selectedItemType,
+    );
+
+    final box = await Hive.openBox<Item>('items');
+    await box.add(item);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Item added successfully')),
+      );
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void dispose() {
-    super.dispose();
-    _itemNameController.dispose();
     _quantityController.dispose();
+    _purchaseDateController.dispose();
+    _expiryDateController.dispose();
+    _itemNameController.dispose();
+    super.dispose();
   }
 }

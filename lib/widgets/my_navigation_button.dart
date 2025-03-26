@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-
-
-
-
 class MyNavigationButton extends StatefulWidget {
   Color? btnBackground ;
   Color? iconColor ; 
   IconData btnIcon ;
   double? iconSize ;
   VoidCallback onPressed ;
+  double? btnRadius ;
   
   MyNavigationButton({super.key , 
      this.btnBackground = Colors.white,
@@ -16,6 +13,7 @@ class MyNavigationButton extends StatefulWidget {
     required this.btnIcon ,
     required this.onPressed ,
     this.iconSize = 18 ,
+    this.btnRadius = 21
   });
 
   @override
