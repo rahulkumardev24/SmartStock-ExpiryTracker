@@ -6,9 +6,11 @@ import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/widgets/expiry_indicator.dart';
+import 'package:smartstock/widgets/my_filled_button.dart';
 import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'package:intl/intl.dart';
 import 'package:smartstock/screen/add_item_screen.dart';
+import 'package:smartstock/widgets/my_outline_button.dart';
 
 class CategoryItemsScreen extends StatelessWidget {
   final String categoryType;
@@ -20,6 +22,7 @@ class CategoryItemsScreen extends StatelessWidget {
     required this.itemType,
   });
 
+ /// check how many day left
   int _getDaysLeft(String expiryDate) {
     try {
       final expiry = DateFormat('dd MMM yyyy').parse(expiryDate);
@@ -32,27 +35,33 @@ class CategoryItemsScreen extends StatelessWidget {
     }
   }
 
+
+  /// delete alert
   Future<bool> _confirmDelete(BuildContext context, String itemName) async {
     return await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete "$itemName"?'),
+          title:  Text('Confirm Delete' , style: myTextStyle18(fontWeight: FontWeight.bold),),
+          content: Text('Are you sure you want to delete "$itemName"?' , style: myTextStyle12(),),
+          backgroundColor: AppColors.primary,
           actions: [
-            TextButton(
+            MyOutlineButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
+              btnText: 'Cancel',
+              borderColor: Colors.black45,
+              borderRadius: 21,
+              btnTextColor:Colors.black45 ,
+              btnBackground: Colors.transparent,
+
             ),
-            TextButton(
+            MyFilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(
-                'Delete',
-                style: TextStyle(color: Colors.red[700]),
-              ),
+              btnText: 'Delete',
+              btnTextColor: Colors.white,
+              btnBackground: Colors.red,
+              borderRadius: 21,
+
             ),
           ],
         );
@@ -369,12 +378,13 @@ class CategoryItemsScreen extends StatelessWidget {
         icon: const FaIcon(FontAwesomeIcons.plus),
         elevation: 0,
       ),
+
       /// --- Body --- ///
       body: ValueListenableBuilder(
         valueListenable: Hive.box<Item>('items').listenable(),
         builder: (context, Box<Item> box, _) {
-          final items = box.values.where(
-                    (item) =>
+          /// get final item according to title
+          final items = box.values.where((item) =>
                         item.categoryType.toLowerCase() == categoryType.toLowerCase() &&
                         item.itemType.toLowerCase() == itemType.toLowerCase(),
                   )

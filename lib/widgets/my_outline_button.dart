@@ -36,6 +36,7 @@ class _MyFilledButtonState extends State<MyOutlineButton> {
     return ElevatedButton(
         onPressed: widget.onPressed,
         style: ElevatedButton.styleFrom(
+          elevation: 0,
             backgroundColor: widget.btnBackground,
             side:  BorderSide(width: 2 , color: widget.borderColor!),
             shape: RoundedRectangleBorder(

@@ -34,6 +34,7 @@ class _MyFilledButtonState extends State<MyFilledButton> {
       onPressed: widget.onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: widget.btnBackground,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius!),
         ),

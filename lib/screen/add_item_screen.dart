@@ -12,6 +12,7 @@ import 'package:smartstock/utils/image_utils.dart';
 import 'package:smartstock/widgets/my_filled_button.dart';
 import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'package:smartstock/widgets/my_outline_button.dart';
+import 'package:smartstock/widgets/my_snack_message.dart';
 
 class AddItemScreen extends StatefulWidget {
   final String? prefilledCategory;
@@ -98,7 +99,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       borderColor: Colors.black45,
                     ),
                     MyFilledButton(
-                      btnText: 'Confirm date',
+                      btnText: 'Select date',
                       borderRadius: 8,
                       onPressed: () {
                         setState(() {
@@ -176,12 +177,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
         selectedImage = permanentPath;
       });
     }
-  }
-
-  void mySnackBar({required String message, Color? backgroundColor}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message , style: myTextStyle18(fontColor: Colors.white),), backgroundColor: backgroundColor),
-    );
   }
 
   @override
@@ -296,7 +291,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   btnText: "+ Add this item",
                   btnBackground: AppColors.main,
                   borderRadius: 8,
-
                   /// here we add items
                   onPressed: _saveItem,
                 ),
@@ -541,22 +535,16 @@ class _AddItemScreenState extends State<AddItemScreen> {
         child: InkWell(
           onTap: () {
             if (selectedCategoryType.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "First select a category",
-                    style: myTextStyle18(fontColor: Colors.white),
-                  ),
-                  backgroundColor: Colors.red,
-                  action: SnackBarAction(
-                    label: "OK",
-                    textColor: Colors.white,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                  ),
-                ),
-              );
+              /// here  we call MySnackMessage
+              MySnackMessage(
+                message: 'First select a category',
+                backgroundColor: Colors.red.shade400,
+                actionLabel: "Ok",
+                labelTextColor: Colors.black54,
+                onActionPressed: () {
+                  _showItemCategoriesBottomSheet();
+                },
+              ).show(context);
             } else {
               // Open item type selection if category is selected
               _showItemTypeBottomSheet();
@@ -692,9 +680,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
         _expiryDateController.text.isEmpty ||
         selectedCategoryType.isEmpty ||
         selectedItemType.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
-      );
+      MySnackMessage(
+        message: 'Please fill all required fields',
+        backgroundColor: Colors.red.shade400,
+        actionLabel: "Ok",
+        labelTextColor: Colors.black54,
+        onActionPressed: () {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        },
+      ).show(context);
       return;
     }
 

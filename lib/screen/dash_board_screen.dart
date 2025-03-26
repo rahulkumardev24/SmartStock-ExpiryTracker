@@ -101,7 +101,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               ],
             ),
 
-            /// Shop Tab
+            /// list Tab
             GestureDetector(
               onTap: () => _onItemTapped(1),
               child: Column(

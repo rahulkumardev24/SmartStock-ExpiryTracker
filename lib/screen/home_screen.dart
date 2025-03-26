@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mqHeight = MediaQuery.of(context).size.height;
     final mqWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -148,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                /// Restaurant Button
+                /// Medicine Button
                 GestureDetector(
                   onTap: () {
                     setState(() {
