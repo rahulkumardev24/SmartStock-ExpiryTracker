@@ -4,8 +4,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:smartstock/models/item_model.dart';
+import 'package:smartstock/screen/add_item_screen.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
+import 'package:smartstock/widgets/expiry_indicator.dart';
 
 class ListScreen extends StatelessWidget {
   const ListScreen({super.key});
@@ -13,7 +15,6 @@ class ListScreen extends StatelessWidget {
   int _getDaysLeft(String expiryDate) {
     try {
       final expiry = DateFormat('dd MMM yyyy').parse(expiryDate);
-      // Set both times to start of day for accurate comparison
       final now = DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
       final expiryDay = expiry.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
       return expiryDay.difference(now).inDays;
@@ -26,7 +27,6 @@ class ListScreen extends StatelessWidget {
     final daysLeft = _getDaysLeft(expiryDate);
     
     if (daysLeft < 0) {
-      // Expired
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
@@ -43,9 +43,9 @@ class ListScreen extends StatelessWidget {
               size: 12,
             ),
             const SizedBox(width: 4),
-            Text(
+            const Text(
               'Expired',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.red,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -55,7 +55,6 @@ class ListScreen extends StatelessWidget {
         ),
       );
     } else if (daysLeft == 0) {
-      // Expires today
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
@@ -72,9 +71,9 @@ class ListScreen extends StatelessWidget {
               size: 12,
             ),
             const SizedBox(width: 4),
-            Text(
+            const Text(
               'Expires Today',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.orange,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -84,7 +83,6 @@ class ListScreen extends StatelessWidget {
         ),
       );
     } else if (daysLeft == 1) {
-      // Expires tomorrow
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
@@ -101,9 +99,9 @@ class ListScreen extends StatelessWidget {
               size: 12,
             ),
             const SizedBox(width: 4),
-            Text(
+            const Text(
               'Expires Tomorrow',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.orange,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -115,11 +113,6 @@ class ListScreen extends StatelessWidget {
     }
     
     return const SizedBox.shrink();
-  }
-
-  bool _isExpiringSoon(String expiryDate) {
-    final daysLeft = _getDaysLeft(expiryDate);
-    return daysLeft >= 0 && daysLeft <= 30;
   }
 
   Widget _buildInfoChip(IconData icon, String label, {bool isExpiringSoon = false}) {
@@ -150,6 +143,39 @@ class ListScreen extends StatelessWidget {
     );
   }
 
+  bool _isExpiringSoon(String expiryDate) {
+    final daysLeft = _getDaysLeft(expiryDate);
+    return daysLeft >= 0 && daysLeft <= 30;
+  }
+
+  Future<bool> _confirmDelete(BuildContext context, String itemName) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete "$itemName"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red[700]),
+              ),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,10 +188,25 @@ class ListScreen extends StatelessWidget {
           style: myTextStyle18(fontWeight: FontWeight.bold),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddItemScreen(),
+            ),
+          );
+        },
+        backgroundColor: AppColors.main,
+        heroTag: 'add_item_list',
+        label: Text("Add item", style: myTextStyle18(fontColor: Colors.white)),
+        icon: const FaIcon(FontAwesomeIcons.plus),
+        elevation: 0,
+      ),
       body: ValueListenableBuilder(
         valueListenable: Hive.box<Item>('items').listenable(),
         builder: (context, Box<Item> box, _) {
-          if (box.values.isEmpty) {
+          if (box.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -173,15 +214,20 @@ class ListScreen extends StatelessWidget {
                   FaIcon(
                     FontAwesomeIcons.boxOpen,
                     size: 64,
-                    color: AppColors.main.withOpacity(0.5),
+                    color: AppColors.main.withAlpha(100),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No items added yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.main.withOpacity(0.5),
+                    style: myTextStyle18(
+                      fontColor: AppColors.main.withAlpha(100),
+                    ),
+                  ),
+                  Text(
+                    'Click on the Add Item button to get started',
+                    style: myTextStyle12(
+                      fontColor: Colors.black45,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -189,7 +235,6 @@ class ListScreen extends StatelessWidget {
             );
           }
 
-          // Sort items: Today/Tomorrow first, then others
           final items = box.values.toList();
           items.sort((a, b) {
             final daysLeftA = _getDaysLeft(a.expiryDate);
@@ -213,7 +258,7 @@ class ListScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = items[index];
               return Dismissible(
-                key: Key(item.key.toString()),
+                key: ValueKey(item.key),
                 background: Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
@@ -228,10 +273,19 @@ class ListScreen extends StatelessWidget {
                   ),
                 ),
                 direction: DismissDirection.endToStart,
+                confirmDismiss: (direction) => _confirmDelete(context, item.itemName),
                 onDismissed: (direction) {
-                  item.delete();
+                  box.deleteAt(box.values.toList().indexOf(item));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Item deleted')),
+                    SnackBar(
+                      content: Text('${item.itemName} deleted'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          box.add(item);
+                        },
+                      ),
+                    ),
                   );
                 },
                 child: Container(
@@ -248,72 +302,91 @@ class ListScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: item.imagePath != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              File(item.imagePath!),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      leading: item.imagePath != null && item.imagePath!.isNotEmpty
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                File(item.imagePath!),
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.main.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: FaIcon(
+                                      item.categoryType.toLowerCase() == 'grocery'
+                                          ? FontAwesomeIcons.box
+                                          : FontAwesomeIcons.capsules,
+                                      color: AppColors.main,
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          : Container(
                               width: 60,
                               height: 60,
-                              fit: BoxFit.cover,
+                              decoration: BoxDecoration(
+                                color: AppColors.main.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: FaIcon(
+                                item.categoryType.toLowerCase() == 'grocery'
+                                    ? FontAwesomeIcons.box
+                                    : FontAwesomeIcons.capsules,
+                                color: AppColors.main,
+                              ),
                             ),
-                          )
-                        : Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: AppColors.main.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: FaIcon(
-                              FontAwesomeIcons.box,
-                              color: AppColors.main,
-                            ),
-                          ),
-                    title: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            item.itemName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.itemName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        _buildExpiryBadge(item.expiryDate),
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            _buildInfoChip(
-                              FontAwesomeIcons.layerGroup,
-                              'Qty: ${item.quantity}',
-                            ),
-                            const SizedBox(width: 8),
-                            _buildInfoChip(
-                              FontAwesomeIcons.tag,
-                              item.categoryType,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            _buildInfoChip(
-                              FontAwesomeIcons.calendar,
-                              'Expires: ${item.expiryDate}',
-                              isExpiringSoon: _isExpiringSoon(item.expiryDate),
-                            ),
-                          ],
-                        ),
-                      ],
+                          _buildExpiryBadge(item.expiryDate),
+                        ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _buildInfoChip(
+                                FontAwesomeIcons.layerGroup,
+                                'Qty: ${item.quantity}',
+                              ),
+                              _buildInfoChip(
+                                FontAwesomeIcons.tag,
+                                item.categoryType,
+                              ),
+                              _buildInfoChip(
+                                FontAwesomeIcons.calendar,
+                                'Expires: ${item.expiryDate}',
+                                isExpiringSoon: _isExpiringSoon(item.expiryDate),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          ExpiryIndicator(expiryDate: item.expiryDate),
+                        ],
+                      ),
                     ),
                   ),
                 ),

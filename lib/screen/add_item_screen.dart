@@ -8,6 +8,7 @@ import 'package:smartstock/constant/app_constant.dart';
 import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
+import 'package:smartstock/utils/image_utils.dart';
 import 'package:smartstock/widgets/my_filled_button.dart';
 import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'package:smartstock/widgets/my_outline_button.dart';
@@ -71,7 +72,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 height: 250,
                 child: CalendarDatePicker(
                   initialDate: selectedDate,
-                  firstDate: DateTime.now(),
+                  firstDate: DateTime(2025),
                   lastDate: DateTime(2100),
                   onDateChanged: (date) {
                     selectedDate = date;
@@ -164,10 +165,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
   /// Function to Pick Image from Camera or Gallery
   void _imagePick(ImageSource source) async {
     final imagePicker = ImagePicker();
-    final XFile? pickedImage = await imagePicker.pickImage(source: source);
+    final XFile? pickedImage = await imagePicker.pickImage(
+      source: source,
+      imageQuality: 80, // Compress image to reduce size
+    );
     if (pickedImage != null) {
+      // Save image permanently
+      final permanentPath = await ImageUtils.saveImagePermanently(pickedImage.path);
       setState(() {
-        selectedImage = pickedImage.path;
+        selectedImage = permanentPath;
       });
     }
   }
