@@ -31,20 +31,6 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     });
   }
 
-  int _getExpiringItemsCount() {
-    final box = Hive.box<Item>('items');
-    return box.values.where((item) {
-      try {
-        final expiry = DateFormat('dd MMM yyyy').parse(item.expiryDate);
-        final now = DateTime.now();
-        final difference = expiry.difference(now).inDays;
-        return difference <= 2 && difference >= 0;
-      } catch (e) {
-        return false;
-      }
-    }).length;
-  }
-
   @override
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
