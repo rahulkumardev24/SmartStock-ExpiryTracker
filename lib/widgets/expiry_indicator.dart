@@ -54,18 +54,17 @@ class ExpiryIndicator extends StatelessWidget {
       indicatorColor = Colors.green;
       progress = 0.2;
     }
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(height: 8),
         ClipRRect(
           borderRadius: BorderRadius.circular(2),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: Colors.black26,
             valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
-            minHeight: 4,
+            minHeight: 5,
           ),
         ),
       ],
