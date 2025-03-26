@@ -247,14 +247,13 @@ class CategoryItemsScreen extends StatelessWidget {
 
   Widget _buildExpiryBadge(String expiryDate) {
     final daysLeft = _getDaysLeft(expiryDate);
-
     if (daysLeft < 0) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
+          color: Colors.red.withAlpha(40),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.red.withOpacity(0.3)),
+          border: Border.all(color: Colors.red.withAlpha(80)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -265,14 +264,11 @@ class CategoryItemsScreen extends StatelessWidget {
               size: 12,
             ),
             const SizedBox(width: 4),
-            const Text(
+             Text(
               'Expired',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+              style: myTextStyle12(fontColor: Colors.red , fontWeight: FontWeight.bold)
               ),
-            ),
+
           ],
         ),
       );
@@ -280,9 +276,9 @@ class CategoryItemsScreen extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.orange.withOpacity(0.1),
+          color: Colors.orange.withAlpha(40),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+          border: Border.all(color: Colors.orange.withAlpha(80)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -293,13 +289,9 @@ class CategoryItemsScreen extends StatelessWidget {
               size: 12,
             ),
             const SizedBox(width: 4),
-            const Text(
+             Text(
               'Expires Today',
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
+              style: myTextStyle12(fontColor: Colors.orange , fontWeight: FontWeight.bold)
             ),
           ],
         ),
@@ -308,9 +300,9 @@ class CategoryItemsScreen extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.orange.withOpacity(0.1),
+          color: Colors.orange.withAlpha(40),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.orange.withOpacity(0.3)),
+          border: Border.all(color: Colors.orange.withAlpha(80)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -321,13 +313,9 @@ class CategoryItemsScreen extends StatelessWidget {
               size: 12,
             ),
             const SizedBox(width: 4),
-            const Text(
+             Text(
               'Expires Tomorrow',
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
+              style:myTextStyle12(fontWeight: FontWeight.bold , fontColor: Colors.orange) ,
             ),
           ],
         ),
