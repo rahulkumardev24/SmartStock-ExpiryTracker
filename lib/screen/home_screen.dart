@@ -10,6 +10,7 @@ import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/widgets/my_list_card.dart';
 import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'package:smartstock/widgets/notification_badge.dart';
+import 'package:smartstock/widgets/search_box.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +20,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final searchController = TextEditingController();
+  bool isSearchOpen = false;
+  List<Item> filteredItems = [];
+
   /// here we create function for greeting
   String getGreeting() {
     int hour = DateTime.now().hour;
@@ -31,6 +36,33 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       return "Good Night";
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    searchController.addListener(_filterItems);
+  }
+
+  @override
+  void dispose() {
+    searchController.removeListener(_filterItems);
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterItems() {
+    final query = searchController.text.toLowerCase();
+    final box = Hive.box<Item>('items');
+
+    setState(() {
+      filteredItems =
+          box.values.where((item) {
+            return item.itemName.toLowerCase().contains(query) ||
+                item.categoryType.toLowerCase().contains(query) ||
+                item.expiryDate.toLowerCase().contains(query);
+          }).toList();
+    });
   }
 
   int _getExpiringItemsCount() {
@@ -47,26 +79,49 @@ class _HomeScreenState extends State<HomeScreen> {
     }).length;
   }
 
-
   @override
   Widget build(BuildContext context) {
     final mqWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
 
-      /// --- APP BAR --- ///
+      /// ---- APP BAR ---- ///
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(getGreeting(), style: myTextStyle12()),
             Text(
-              "Rahul kumar Sahu ",
+              "Rahul Kumar Sahu",
               style: myTextStyle18(fontWeight: FontWeight.bold),
             ),
           ],
         ),
         actions: [
+          SizedBox(
+            width: mqWidth * 0.11,
+            height: mqWidth * 0.11,
+            child: MyNavigationButton(
+              btnIcon:
+                  isSearchOpen
+                      ? FontAwesomeIcons.xmark
+                      : FontAwesomeIcons.magnifyingGlass,
+              onPressed: () {
+                setState(() {
+                  isSearchOpen = !isSearchOpen;
+                  if (!isSearchOpen) {
+                    searchController.clear();
+                  }
+                });
+              },
+              iconSize: 21,
+              btnRadius: 100,
+              btnBackground: Colors.black12.withAlpha(20),
+            ),
+          ),
+          SizedBox(width: 12),
+          SizedBox(width: 12),
           ValueListenableBuilder(
             valueListenable: Hive.box<Item>('items').listenable(),
             builder: (context, box, _) {
@@ -108,65 +163,56 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       /// ---- BODY ---- ///
-      body: ValueListenableBuilder(
-        valueListenable: Hive.box<Item>('items').listenable(),
-        builder: (context, Box<Item> box, _) {
-          if (box.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FaIcon(
-                    FontAwesomeIcons.boxOpen,
-                    size: 64,
-                    color: AppColors.main.withAlpha(100),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No items added yet',
-                    style: myTextStyle18(
-                      fontColor: AppColors.main.withAlpha(100),
+      body: Column(
+        children: [
+          if (isSearchOpen)
+            SearchBox(
+              controller: searchController,
+              onSearch: (query) {
+                _filterItems();
+              },
+            ),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: Hive.box<Item>('items').listenable(),
+              builder: (context, Box<Item> box, _) {
+                final itemsToShow =
+                    searchController.text.isEmpty
+                        ? box.values.toList().reversed.toList()
+                        : filteredItems.reversed.toList();
+                if (itemsToShow.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FaIcon(
+                          FontAwesomeIcons.boxOpen,
+                          size: 64,
+                          color: AppColors.main.withAlpha(100),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No items found',
+                          style: myTextStyle18(
+                            fontColor: AppColors.main.withAlpha(100),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    'Click on the Add Item button to get started',
-                    style: myTextStyle12(
-                      fontColor: Colors.black45,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final items = box.values.toList();
-          items.sort((a, b) {
-            final daysLeftA = AppUtils.getDaysLeft(a.expiryDate);
-            final daysLeftB = AppUtils.getDaysLeft(b.expiryDate);
-
-            /// Put today/tomorrow items first
-            if ((daysLeftA == 0 || daysLeftA == 1) &&
-                (daysLeftB != 0 && daysLeftB != 1)) {
-              return -1;
-            }
-            if ((daysLeftB == 0 || daysLeftB == 1) &&
-                (daysLeftA != 0 && daysLeftA != 1)) {
-              return 1;
-            }
-
-            // For other items, sort by expiry date
-            return daysLeftA.compareTo(daysLeftB);
-          });
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index];
-              return MyListCard(item: item, box: box);
-            },
-          );
-        },
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: itemsToShow.length,
+                  itemBuilder: (context, index) {
+                    final item = itemsToShow[index];
+                    return MyListCard(item: item, box: box);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
