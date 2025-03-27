@@ -1,15 +1,8 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive/hive.dart';
-import 'package:smartstock/main.dart' as AppColors;
-import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/utils/app_utils.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/expiry_indicator.dart';
-import 'package:smartstock/widgets/my_snack_message.dart';
+
 
 class CustomWidgets{
 
@@ -92,8 +85,6 @@ class CustomWidgets{
     }
     return const SizedBox.shrink();
   }
-
-
 
 
  /// infoChip

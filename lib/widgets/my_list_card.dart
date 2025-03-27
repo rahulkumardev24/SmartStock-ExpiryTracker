@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smartstock/models/item_model.dart';
+import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/widgets/my_snack_message.dart';
 import '../utils/app_utils.dart';
 import '../utils/custom_widgets.dart';
@@ -43,13 +44,14 @@ class MyListCard extends StatelessWidget {
           message: '${item.itemName} deleted successfully',
           fontWeight: FontWeight.bold,
           actionLabel: "Undo",
-          backgroundColor: Colors.green.shade300,
+          backgroundColor: Colors.red.shade400,
           onActionPressed: () {
             box.add(item);
           },
         ).show(context);
       },
 
+      /// main Container
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
@@ -77,21 +79,24 @@ class MyListCard extends StatelessWidget {
             /// --- Details --- ///
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.only(right: 8.0 , top: 8.0 , bottom: 8.0),
                 child: Column(
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CustomWidgets.expiryBadge(item.expiryDate),
+                      ],
+                    ),
                     Row(
                       children: [
                         Expanded(
                           child: Text(
                             item.itemName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: myTextStyle15(),
                           ),
                         ),
-                        CustomWidgets.expiryBadge(item.expiryDate),
+
                       ],
                     ),
                     Column(

@@ -3,10 +3,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:smartstock/models/item_model.dart';
+import 'package:smartstock/utils/app_utils.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/expiry_indicator.dart';
+import 'package:smartstock/utils/custom_widgets.dart';
 import 'dart:io';
+
+import 'package:smartstock/widgets/my_navigation_button.dart';
+import 'package:smartstock/widgets/my_snack_message.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -15,7 +19,8 @@ class NotificationScreen extends StatefulWidget {
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> with SingleTickerProviderStateMixin {
+class _NotificationScreenState extends State<NotificationScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -33,232 +38,24 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
   int _getDaysLeft(String expiryDate) {
     try {
       final expiry = DateFormat('dd MMM yyyy').parse(expiryDate);
-      final now = DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
-      final expiryDay = expiry.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+      final now = DateTime.now().copyWith(
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+        microsecond: 0,
+      );
+      final expiryDay = expiry.copyWith(
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+        microsecond: 0,
+      );
       return expiryDay.difference(now).inDays;
     } catch (e) {
       return 0;
     }
-  }
-
-  String _getExpiryText(String expiryDate) {
-    final daysLeft = _getDaysLeft(expiryDate);
-    if (daysLeft < 0) {
-      return 'Expired';
-    } else if (daysLeft == 0) {
-      return 'Expires Today';
-    } else if (daysLeft == 1) {
-      return 'Expires Tomorrow';
-    } else {
-      return 'Expires in $daysLeft days';
-    }
-  }
-
-  Color _getExpiryColor(int daysLeft) {
-    if (daysLeft < 0) {
-      return Colors.red;
-    } else if (daysLeft <= 1) {
-      return Colors.orange;
-    } else {
-      return Colors.orange;
-    }
-  }
-
-  bool _isExpiringSoon(String expiryDate) {
-    final daysLeft = _getDaysLeft(expiryDate);
-    return daysLeft <= 7;
-  }
-
-  Widget _buildInfoChip(IconData icon, String text, {bool isExpiringSoon = false}) {
-    return Chip(
-      avatar: FaIcon(
-        icon,
-        size: 16,
-        color: isExpiringSoon ? Colors.orange : Colors.grey[600],
-      ),
-      label: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          color: isExpiringSoon ? Colors.orange : Colors.grey[600],
-        ),
-      ),
-      backgroundColor: Colors.grey[100],
-    );
-  }
-
-  Widget _buildExpiryBadge(String expiryDate) {
-    final daysLeft = _getDaysLeft(expiryDate);
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: daysLeft < 0 ? Colors.red : daysLeft <= 1 ? Colors.orange : Colors.green,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        _getExpiryText(expiryDate),
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Future<bool> _confirmDelete(BuildContext context, String itemName) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete "$itemName"?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(
-                'Delete',
-                style: TextStyle(color: Colors.red[700]),
-              ),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
-  }
-
-  Widget _buildItemCard(Item item, Box<Item> box) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          leading: item.imagePath != null && item.imagePath!.isNotEmpty
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    File(item.imagePath!),
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: AppColors.main.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: FaIcon(
-                          item.categoryType.toLowerCase() == 'grocery'
-                              ? FontAwesomeIcons.box
-                              : FontAwesomeIcons.capsules,
-                          color: AppColors.main,
-                        ),
-                      );
-                    },
-                  ),
-                )
-              : Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: AppColors.main.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: FaIcon(
-                    item.categoryType.toLowerCase() == 'grocery'
-                        ? FontAwesomeIcons.box
-                        : FontAwesomeIcons.capsules,
-                    color: AppColors.main,
-                  ),
-                ),
-          title: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  item.itemName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              _buildExpiryBadge(item.expiryDate),
-            ],
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _buildInfoChip(
-                    FontAwesomeIcons.layerGroup,
-                    'Qty: ${item.quantity}',
-                  ),
-                  _buildInfoChip(
-                    FontAwesomeIcons.tag,
-                    item.categoryType,
-                  ),
-                  _buildInfoChip(
-                    FontAwesomeIcons.calendar,
-                    'Expires: ${item.expiryDate}',
-                    isExpiringSoon: _isExpiringSoon(item.expiryDate),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              ExpiryIndicator(expiryDate: item.expiryDate),
-            ],
-          ),
-          trailing: IconButton(
-            icon: const FaIcon(
-              FontAwesomeIcons.trash,
-              color: Colors.red,
-              size: 20,
-            ),
-            onPressed: () async {
-              if (await _confirmDelete(context, item.itemName)) {
-                box.deleteAt(box.values.toList().indexOf(item));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${item.itemName} deleted'),
-                    action: SnackBarAction(
-                      label: 'Undo',
-                      onPressed: () {
-                        box.add(item);
-                      },
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -272,47 +69,64 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
           "Notifications",
           style: myTextStyle18(fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: MyNavigationButton(
+            btnIcon: Icons.arrow_back_ios_new_outlined,
+            btnBackground: Colors.black12,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Expiring Soon'),
-            Tab(text: 'Expired'),
-          ],
+          tabs: const [Tab(text: 'Expiring Soon'), Tab(text: 'Expired')],
           labelColor: AppColors.main,
           unselectedLabelColor: Colors.grey,
           indicatorColor: AppColors.main,
+          labelStyle: myTextStyle18(),
+          dividerHeight: 0,
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildItemsList(isExpired: false),
-          _buildItemsList(isExpired: true),
+          /// for expiry soon
+          tabList(isExpired: false),
+
+          /// for expired
+          tabList(isExpired: true),
         ],
       ),
     );
   }
 
-  Widget _buildItemsList({required bool isExpired}) {
+  Widget tabList({required bool isExpired}) {
     return ValueListenableBuilder(
       valueListenable: Hive.box<Item>('items').listenable(),
       builder: (context, Box<Item> box, _) {
-        final items = box.values.where((item) {
-          final daysLeft = _getDaysLeft(item.expiryDate);
-          if (isExpired) {
-            return daysLeft < 0;
-          } else {
-            return daysLeft >= 0 && daysLeft <= 7;
-          }
-        }).toList();
+        final items =
+            box.values.where((item) {
+              final daysLeft = _getDaysLeft(item.expiryDate);
+              if (isExpired) {
+                return daysLeft < 0;
+              } else {
+                return daysLeft >= 0 && daysLeft <= 7;
+              }
+            }).toList();
 
+        /// if empty
         if (items.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FaIcon(
-                  isExpired ? FontAwesomeIcons.circleCheck : FontAwesomeIcons.bell,
+                  isExpired
+                      ? FontAwesomeIcons.circleCheck
+                      : FontAwesomeIcons.bell,
                   size: 64,
                   color: AppColors.main.withAlpha(100),
                 ),
@@ -328,16 +142,147 @@ class _NotificationScreenState extends State<NotificationScreen> with SingleTick
           );
         }
 
+        /// if data
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: items.length,
           itemBuilder: (context, index) {
             final item = items[index];
-
-            return _buildItemCard(item, box);
+            return notificationItemCard(item, box, isExpired);
           },
         );
       },
+    );
+  }
+
+  Widget InfoChip(IconData icon, String text, {bool isExpiringSoon = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white60,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          FaIcon(icon, size: 12, color: Colors.black.withAlpha(170)),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: myTextStyle12(fontColor: Colors.black.withAlpha(170)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget notificationItemCard(Item item, Box<Item> box, bool isExpired) {
+    return InkWell(
+      onLongPress: () async {
+        if (await AppUtils.confirmDelete(context, item.itemName)) {
+          box.deleteAt(box.values.toList().indexOf(item));
+          MySnackMessage(
+            message: '${item.itemName} deleted',
+            backgroundColor: Colors.red.shade400,
+            actionLabel: "Undo",
+            labelTextColor: Colors.black87,
+            onActionPressed: () {
+              box.add(item);
+            },
+          ).show(context);
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color:
+              isExpired
+                  ? Colors.red.shade100.withAlpha(100)
+                  : (isExpired == false
+                      ? Colors.orange.shade100.withAlpha(100)
+                      : Color(0xff80BCBD).withAlpha(50)),
+
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            /// Item Image
+            item.imagePath != null && item.imagePath!.isNotEmpty
+                ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(item.imagePath!),
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      height: MediaQuery.of(context).size.width * 0.2,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
+                : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.2,
+                    height: MediaQuery.of(context).size.width * 0.2,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff80BCBD).withAlpha(50),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: FaIcon(
+                        item.categoryType.toLowerCase() == 'grocery'
+                            ? FontAwesomeIcons.basketShopping
+                            : FontAwesomeIcons.capsules,
+                        color: const Color(0xff80BCBD),
+                        size: MediaQuery.of(context).size.width * 0.15,
+                      ),
+                    ),
+                  ),
+                ),
+
+            /// --- Details --- ///
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          /// item name
+                          child: Text(item.itemName, style: myTextStyle15()),
+                        ),
+                        CustomWidgets.expiryBadge(item.expiryDate),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            /// icon chip call
+                            InfoChip(
+                              FontAwesomeIcons.layerGroup,
+                              'Qty: ${item.quantity}',
+                            ),
+                            InfoChip(FontAwesomeIcons.tag, item.categoryType),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

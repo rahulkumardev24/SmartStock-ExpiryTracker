@@ -10,6 +10,7 @@ class MySnackMessage extends StatelessWidget {
   final double fontSize;
   final Color messageColor;
   final Color labelTextColor ;
+  final Color labelBackgroundColor ;
 
   const MySnackMessage({
     super.key,
@@ -21,7 +22,8 @@ class MySnackMessage extends StatelessWidget {
     this.fontWeight = FontWeight.normal,
     this.fontSize = 18,
     this.messageColor = Colors.white,
-    this.labelTextColor = Colors.black45
+    this.labelTextColor = Colors.black54 ,
+    this.labelBackgroundColor = Colors.white24
   });
 
   void show(BuildContext context) {
@@ -41,6 +43,7 @@ class MySnackMessage extends StatelessWidget {
         action:
             actionLabel!.isNotEmpty
                 ? SnackBarAction(
+              backgroundColor: labelBackgroundColor,
                   label: actionLabel!,
                   textColor: labelTextColor,
                   onPressed: onActionPressed ?? () {},

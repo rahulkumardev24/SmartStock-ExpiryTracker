@@ -4,7 +4,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/screen/notification_screen.dart';
-import 'package:smartstock/utils/app_utils.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/widgets/my_list_card.dart';
@@ -22,6 +21,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final searchController = TextEditingController();
   bool isSearchOpen = false;
+  bool isShort = false;
+  final itemCount = Hive.box<Item>('items');
   List<Item> filteredItems = [];
 
   /// here we create function for greeting
@@ -82,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final mqWidth = MediaQuery.of(context).size.width;
+    final mqHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -163,23 +165,130 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       /// ---- BODY ---- ///
-      body: Column(
-        children: [
-          if (isSearchOpen)
-            SearchBox(
-              controller: searchController,
-              onSearch: (query) {
-                _filterItems();
-              },
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (isSearchOpen)
+              SearchBox(
+                controller: searchController,
+                onSearch: (query) {
+                  _filterItems();
+                },
+              ),
+
+            /// poster
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 12,
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(21),
+                    child: Image.asset(
+                      "assets/images/poster.jpg",
+                      fit: BoxFit.cover,
+                      height: mqHeight * 0.15,
+                      width: mqWidth,
+                    ),
+                  ),
+                  Positioned(
+                    left: mqWidth * 0.05,
+                    child: SizedBox(
+                      height: mqHeight * 0.15,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Eat Fresh",
+                            style: TextStyle(
+                              fontFamily: "secondary",
+                              fontSize: mqHeight * 0.025,
+                            ),
+                          ),
+                          Text("and", style: myTextStyle18()),
+                          Text(
+                            "Feel Fresh",
+                            style: TextStyle(
+                              fontFamily: "secondary",
+                              fontSize: mqHeight * 0.025,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          Expanded(
-            child: ValueListenableBuilder(
+
+            /// all items row
+
+   itemCount.isEmpty ? SizedBox() :Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text("All items", style: myTextStyle18()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(width: 1),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      searchController.text.isNotEmpty
+                          ? "${filteredItems.length}"
+                          : "$itemCount",
+                      style: myTextStyle15(fontColor: Colors.black54),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          InkWell(
+            onTap: () {
+              setState(() {
+                isShort = !isShort;
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: isShort ? AppColors.main.withAlpha(100) : Colors.transparent,
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: AppColors.main),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Image.asset(
+                  "assets/icons/sort.png",
+                  height: 21,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+
+    ValueListenableBuilder(
               valueListenable: Hive.box<Item>('items').listenable(),
               builder: (context, Box<Item> box, _) {
                 final itemsToShow =
                     searchController.text.isEmpty
-                        ? box.values.toList().reversed.toList()
-                        : filteredItems.reversed.toList();
+                        ? (isShort
+                            ? box.values.toList()
+                            : box.values.toList().reversed.toList())
+                        : (!isShort
+                            ? filteredItems.toList()
+                            : filteredItems.reversed.toList());
                 if (itemsToShow.isEmpty) {
                   return Center(
                     child: Column(
@@ -203,6 +312,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   itemCount: itemsToShow.length,
                   itemBuilder: (context, index) {
                     final item = itemsToShow[index];
@@ -211,8 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

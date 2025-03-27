@@ -41,7 +41,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   children: [
                     Text(
                       "Eat fresh everyday",
-                      style: myTextStyle18(),
+                      style: myTextStyle18(fontFamily: "secondary"),
                     ),
                     Text(
                       "Track expiry dates before it's too late",
