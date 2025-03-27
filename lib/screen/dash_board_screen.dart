@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/screen/add_item_screen.dart';
+import 'package:smartstock/screen/category_screen.dart';
 import 'package:smartstock/screen/home_screen.dart';
-import 'package:smartstock/screen/list_screen.dart';
-import 'package:smartstock/screen/notification_screen.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/notification_badge.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -22,7 +17,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   int _selectedIndex = 0;
 
   /// List of Screens
-  final List<Widget> _screens = [HomeScreen(), ListScreen()];
+  final List<Widget> _screens = [HomeScreen() , CategoryScreen(), ];
 
   /// Function to change tab
   void _onItemTapped(int index) {
@@ -61,7 +56,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            /// Items Tab
+            /// Home Tab
             GestureDetector(
               onTap: () => _onItemTapped(0),
               child: Column(
@@ -101,18 +96,18 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               ],
             ),
 
-            /// list Tab
+            /// Category Tab
             GestureDetector(
               onTap: () => _onItemTapped(1),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   FaIcon(
-                    FontAwesomeIcons.listCheck,
+                    FontAwesomeIcons.layerGroup,
                     color: _selectedIndex == 1 ? Colors.green : Colors.black54,
                   ),
                   Text(
-                    "List",
+                    "Category",
                     style: myTextStyle15(
                       fontColor:
                           _selectedIndex == 1 ? Colors.green : Colors.black54,

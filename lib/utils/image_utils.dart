@@ -3,6 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
 class ImageUtils {
+
   static Future<String> saveImagePermanently(String imagePath) async {
     // Get the application documents directory
     final directory = await getApplicationDocumentsDirectory();

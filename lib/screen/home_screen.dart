@@ -4,13 +4,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:smartstock/models/item_model.dart';
 import 'package:smartstock/screen/notification_screen.dart';
+import 'package:smartstock/utils/app_utils.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
+import 'package:smartstock/widgets/my_list_card.dart';
 import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'package:smartstock/widgets/notification_badge.dart';
-
-import 'grocery_screen.dart';
-import 'medicine_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,13 +19,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  /// Function to return the selected screen
-  Widget _getSelectedScreen() {
-    return _selectedIndex == 0 ? GroceryScreen() : MedicineScreen();
-  }
-
   /// here we create function for greeting
   String getGreeting() {
     int hour = DateTime.now().hour;
@@ -55,10 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }).length;
   }
 
+
   @override
   Widget build(BuildContext context) {
     final mqWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
+
+      /// --- APP BAR --- ///
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,85 +106,67 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         backgroundColor: Colors.white,
       ),
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          /// Custom Tab Bar
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                /// Grocery Button
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedIndex = 0;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color:
-                          _selectedIndex == 0
-                              ? AppColors.main
-                              : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      "Grocery",
-                      style: myTextStyle18(
-                        fontWeight: FontWeight.bold,
-                        fontColor:
-                            _selectedIndex == 0 ? Colors.white : Colors.black54,
-                      ),
+
+      /// ---- BODY ---- ///
+      body: ValueListenableBuilder(
+        valueListenable: Hive.box<Item>('items').listenable(),
+        builder: (context, Box<Item> box, _) {
+          if (box.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.boxOpen,
+                    size: 64,
+                    color: AppColors.main.withAlpha(100),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No items added yet',
+                    style: myTextStyle18(
+                      fontColor: AppColors.main.withAlpha(100),
                     ),
                   ),
-                ),
-
-                /// Medicine Button
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedIndex = 1;
-                    });
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 300),
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    decoration: BoxDecoration(
-                      color:
-                          _selectedIndex == 1
-                              ? AppColors.main
-                              : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      "Medicine",
-                      style: myTextStyle18(
-                        fontWeight: FontWeight.bold,
-                        fontColor:
-                            _selectedIndex == 1 ? Colors.white : Colors.black54,
-                      ),
+                  Text(
+                    'Click on the Add Item button to get started',
+                    style: myTextStyle12(
+                      fontColor: Colors.black45,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          }
 
-          /// Animated Screen Switching
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 300),
-              transitionBuilder:
-                  (widget, animation) =>
-                      FadeTransition(opacity: animation, child: widget),
-              child: _getSelectedScreen(), // Display selected screen
-            ),
-          ),
-        ],
+          final items = box.values.toList();
+          items.sort((a, b) {
+            final daysLeftA = AppUtils.getDaysLeft(a.expiryDate);
+            final daysLeftB = AppUtils.getDaysLeft(b.expiryDate);
+
+            /// Put today/tomorrow items first
+            if ((daysLeftA == 0 || daysLeftA == 1) &&
+                (daysLeftB != 0 && daysLeftB != 1)) {
+              return -1;
+            }
+            if ((daysLeftB == 0 || daysLeftB == 1) &&
+                (daysLeftA != 0 && daysLeftA != 1)) {
+              return 1;
+            }
+
+            // For other items, sort by expiry date
+            return daysLeftA.compareTo(daysLeftB);
+          });
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return MyListCard(item: item, box: box);
+            },
+          );
+        },
       ),
     );
   }
