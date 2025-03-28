@@ -6,6 +6,9 @@ class AppConstant {
     {"image": "assets/images/vegetable.png", "title": "Vegetables"},
     {"image": "assets/images/cupcake.png", "title": "Sweets"},
     {"image": "assets/images/milk.png", "title": "Dairy Products"},
+    {"image": "assets/icons/personal_care.png", "title": "Personal Care"},
+    {"image": "assets/icons/flour.png", "title": "Flour & Wheat"},
+    {"image": "assets/icons/grain-bag.png", "title": "Grains & Pulses"},
     {"image": "assets/images/bakery.png", "title": "Bakery"},
     {"image": "assets/images/candies.png", "title": "Snacks"},
     {"image": "assets/images/chicken-leg.png", "title": "Meat & Poultry"},
@@ -14,6 +17,7 @@ class AppConstant {
     {"image": "assets/images/spices.png", "title": "Spices"},
     {"image": "assets/images/pouring.png", "title": "Cooking Oils"},
     {"image": "assets/images/pet-supplies.png", "title": "Pet Supplies"},
+    {"image": "assets/icons/food.png", "title": "Other"},
   ];
 
  /// --- Medicine_screen --- ///
@@ -27,6 +31,7 @@ class AppConstant {
     {"image": "assets/images/gloves.png", "title": "Gloves"},
     {"image": "assets/images/hand-soap.png", "title": "Sanitizers"},
     {"image": "assets/images/eye-dropper.png", "title": "Eye Drops"},
+    {"image": "assets/icons/plue.png", "title": "Other"},
  ];
 
 }

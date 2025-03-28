@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartstock/screen/add_item_screen.dart';
 import 'package:smartstock/screen/category_screen.dart';
 import 'package:smartstock/screen/home_screen.dart';
@@ -34,6 +35,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       _selectedIndex = index;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

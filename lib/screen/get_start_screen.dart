@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartstock/screen/dash_board_screen.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
@@ -14,6 +15,26 @@ class GetStartedScreen extends StatefulWidget {
 class _GetStartedScreenState extends State<GetStartedScreen> {
   TextEditingController _nameController = TextEditingController();
 
+  /// save name
+  Future<void> saveName() async {
+    if (_nameController.text.isEmpty) {
+      MySnackMessage(
+        message: "Please enter your name",
+        backgroundColor: Colors.red.shade400,
+      ).show(context);
+      return;
+    }
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setString("name", _nameController.text.trim());
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DashBoardScreen(
+          userName: _nameController.text.trim(),
+        ),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
@@ -68,21 +89,18 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                       ),
                     ),
                   ),
-              
+
                   SizedBox(height: 20),
-              
-                  // Welcome Text
-                  SizedBox(height: 10),
-              
+
                   // Subtitle
                   Text(
                     "Your all-in-one solution for tracking groceries, medicines, and daily essentials effortlessly.",
                     style: myTextStyle18(),
                     textAlign: TextAlign.center,
                   ),
-              
+
                   SizedBox(height: 30),
-              
+
                   // Username Input Field
                   TextField(
                     controller: _nameController,
@@ -102,29 +120,16 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                       ),
                     ),
                   ),
-              
+
                   SizedBox(height: 20),
-              
+
                   // Get Started Button
                   SlidingButton(
-                    onComplete: () {
-                      if (_nameController.text.isEmpty) {
-                        MySnackMessage(
-                          message: "Please enter your name",
-                          backgroundColor: Colors.red.shade400,
-                        ).show(context);
-                      } else {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => DashBoardScreen(
-                                  userName: _nameController.text.toString(),
-                                ),
-                          ),
-                        );
-                      }
-                    },
+                      onComplete: () async {
+                        await saveName();
+
+                      },
+
                   ),
                 ],
               ),

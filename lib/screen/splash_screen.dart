@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smartstock/screen/dash_board_screen.dart';
+import 'package:smartstock/screen/get_start_screen.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
-import 'home_screen.dart'; // Replace with your actual home screen file
+
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -28,11 +31,20 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to HomeScreen after delay
     Timer(Duration(seconds: 3), () {
-     /* Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()), // ✅ Fix: Navigate to HomeScreen
-      );*/
+
+      checkName();
+
     });
+  }
+
+  Future<void> checkName() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance() ;
+    final getName = preferences.get("name") ;
+    if(getName == null){
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> GetStartedScreen()));
+    }else {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DashBoardScreen(userName:getName.toString()))) ;
+    }
   }
 
   @override
