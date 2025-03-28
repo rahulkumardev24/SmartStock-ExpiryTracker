@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           SizedBox(width: 12),
-          SizedBox(width: 12),
+
           ValueListenableBuilder(
             valueListenable: Hive.box<Item>('items').listenable(),
             builder: (context, box, _) {
@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             /// all items row
-            itemCount.isEmpty
+            "${Hive.box<Item>('items').length}".isEmpty
                 ? SizedBox()
                 : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -249,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Text(
                                   searchController.text.isNotEmpty
                                       ? "${filteredItems.length}"
-                                      : "$itemCount",
+                                      : "${Hive.box<Item>('items').length}",
                                   style: myTextStyle15(
                                     fontColor: Colors.black54,
                                   ),

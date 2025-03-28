@@ -319,6 +319,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             Text(label, style: myTextStyle15(fontWeight: FontWeight.w500)),
             Expanded(
               child: TextField(
+                style: myTextStyle18(fontColor: Colors.green , fontWeight: FontWeight.bold),
                 controller: controller,
                 textAlign: TextAlign.end,
                 decoration: InputDecoration(
@@ -355,7 +356,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 children: [
                   Text(
                     controller.text.isEmpty ? "Select date" : controller.text,
-                    style: myTextStyle15(fontColor: Colors.black54),
+                    style: myTextStyle15(fontColor: Colors.green , fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
@@ -398,7 +399,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       fontColor:
                           selectedCategoryType.isEmpty
                               ? Colors.black45
-                              : Colors.black,
+                              : Colors.green,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -563,7 +564,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       fontColor:
                           selectedCategoryType.isEmpty
                               ? Colors.black45
-                              : Colors.black,
+                              : Colors.green,
                     ),
                   ),
                   const SizedBox(width: 8),

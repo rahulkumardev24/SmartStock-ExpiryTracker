@@ -9,7 +9,7 @@ import 'package:smartstock/widgets/my_outline_button.dart';
 class AppUtils {
 
   /// delete alert message
- static Future<bool> confirmDelete(BuildContext context, String itemName) async {
+  static Future<bool> confirmDelete(BuildContext context, String itemName) async {
     return await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -47,7 +47,7 @@ class AppUtils {
   }
 
   /// how many date left
- static int getDaysLeft(String expiryDate) {
+  static int getDaysLeft(String expiryDate) {
     try {
       final expiry = DateFormat('dd MMM yyyy').parse(expiryDate);
       final now = DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
@@ -58,8 +58,22 @@ class AppUtils {
     }
   }
 
-static bool isExpiringSoon(String expiryDate) {
-   final daysLeft = getDaysLeft(expiryDate);
-   return daysLeft >= 0 && daysLeft <= 30;
- }
+  /// Get expiry text
+  static String getExpiryText(String expiryDate) {
+    final daysLeft = getDaysLeft(expiryDate);
+    if (daysLeft < 0) {
+      return 'Expired';
+    } else if (daysLeft == 0) {
+      return 'Expires Today';
+    } else if (daysLeft == 1) {
+      return 'Expires Tomorrow';
+    } else {
+      return 'Expires in $daysLeft days';
+    }
+  }
+
+  static bool isExpiringSoon(String expiryDate) {
+    final daysLeft = getDaysLeft(expiryDate);
+    return daysLeft >= 0 && daysLeft <= 30;
+  }
 }
