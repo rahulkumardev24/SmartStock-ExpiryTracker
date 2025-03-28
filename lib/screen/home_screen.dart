@@ -12,7 +12,8 @@ import 'package:smartstock/widgets/notification_badge.dart';
 import 'package:smartstock/widgets/search_box.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  String userName ;
+   HomeScreen({super.key , required this.userName});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -95,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(getGreeting(), style: myTextStyle12()),
             Text(
-              "Rahul Kumar Sahu",
+              widget.userName,
               style: myTextStyle18(fontWeight: FontWeight.bold),
             ),
           ],
@@ -224,61 +225,69 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             /// all items row
-
-   itemCount.isEmpty ? SizedBox() :Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Text("All items", style: myTextStyle18()),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(width: 1),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text(
-                      searchController.text.isNotEmpty
-                          ? "${filteredItems.length}"
-                          : "$itemCount",
-                      style: myTextStyle15(fontColor: Colors.black54),
-                    ),
+            itemCount.isEmpty
+                ? SizedBox()
+                : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text("All items", style: myTextStyle18()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(width: 1),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Text(
+                                  searchController.text.isNotEmpty
+                                      ? "${filteredItems.length}"
+                                      : "$itemCount",
+                                  style: myTextStyle15(
+                                    fontColor: Colors.black54,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            isShort = !isShort;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color:
+                                isShort
+                                    ? AppColors.main.withAlpha(100)
+                                    : Colors.transparent,
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: AppColors.main),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.asset(
+                              "assets/icons/sort.png",
+                              height: 21,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          InkWell(
-            onTap: () {
-              setState(() {
-                isShort = !isShort;
-              });
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: isShort ? AppColors.main.withAlpha(100) : Colors.transparent,
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: AppColors.main),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Image.asset(
-                  "assets/icons/sort.png",
-                  height: 21,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
 
-    ValueListenableBuilder(
+            ValueListenableBuilder(
               valueListenable: Hive.box<Item>('items').listenable(),
               builder: (context, Box<Item> box, _) {
                 final itemsToShow =

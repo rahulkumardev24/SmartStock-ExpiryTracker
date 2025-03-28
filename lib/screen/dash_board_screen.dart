@@ -7,7 +7,9 @@ import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 
 class DashBoardScreen extends StatefulWidget {
-  const DashBoardScreen({super.key});
+  final String userName;
+
+  DashBoardScreen({super.key, required this.userName});
 
   @override
   State<DashBoardScreen> createState() => _DashBoardScreenState();
@@ -15,9 +17,16 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
   int _selectedIndex = 0;
+  late List<Widget> _screens;
 
-  /// List of Screens
-  final List<Widget> _screens = [HomeScreen() , CategoryScreen(), ];
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      HomeScreen(userName: widget.userName),
+      CategoryScreen(),
+    ];
+  }
 
   /// Function to change tab
   void _onItemTapped(int index) {
@@ -29,8 +38,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: _screens[_selectedIndex], // Display selected screen
 
       /// Floating Action Button (FAB)
       floatingActionButton: FloatingActionButton(
@@ -42,15 +52,15 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         },
         elevation: 0,
         backgroundColor: AppColors.main,
-        shape: CircleBorder(),
-        child: FaIcon(FontAwesomeIcons.plus, color: Colors.white),
+        shape: const CircleBorder(),
+        child: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       /// Custom Bottom Navigation Bar
       bottomNavigationBar: BottomAppBar(
         height: mqHeight * 0.09,
-        shape: CircularNotchedRectangle(),
+        shape: const CircularNotchedRectangle(),
         color: AppColors.light,
 
         child: Row(
@@ -69,12 +79,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   Text(
                     "Home",
                     style: myTextStyle15(
-                      fontColor:
-                          _selectedIndex == 0 ? Colors.green : Colors.black54,
-                      fontWeight:
-                          _selectedIndex == 0
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                      fontColor: _selectedIndex == 0 ? Colors.green : Colors.black54,
+                      fontWeight: _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -85,7 +91,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 20), // Space to align with FAB
+                const SizedBox(height: 20), // Space to align with FAB
                 Text(
                   "Add Item",
                   style: myTextStyle15(
@@ -109,12 +115,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   Text(
                     "Category",
                     style: myTextStyle15(
-                      fontColor:
-                          _selectedIndex == 1 ? Colors.green : Colors.black54,
-                      fontWeight:
-                          _selectedIndex == 1
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                      fontColor: _selectedIndex == 1 ? Colors.green : Colors.black54,
+                      fontWeight: _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ],

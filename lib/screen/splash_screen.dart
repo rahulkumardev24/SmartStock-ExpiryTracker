@@ -28,10 +28,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Navigate to HomeScreen after delay
     Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
+     /* Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => SplashScreen()),
-      );
+        MaterialPageRoute(builder: (context) => HomeScreen()), // ✅ Fix: Navigate to HomeScreen
+      );*/
     });
   }
 
@@ -40,25 +40,24 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: 80),
+
             // Animated Logo
             ScaleTransition(
               scale: _animation,
-              child: Lottie.asset('assets/lottie/clock.json'),
+              child: Lottie.asset('assets/lottie/clock.json', height: 180),
             ),
 
             SizedBox(height: 20),
 
-            // Fade-in Text Animation
+            // App Name with Fade-in Animation
             TweenAnimationBuilder(
               tween: Tween<double>(begin: 0, end: 1),
               duration: Duration(seconds: 2),
@@ -67,11 +66,16 @@ class _SplashScreenState extends State<SplashScreen>
               },
               child: Text(
                 "SmartStock",
-                style: myTextStyle24(fontWeight: FontWeight.bold),
+                style: myTextStyle24(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "secondary"
+                ),
               ),
             ),
-            Spacer(),
-            // Fade-in Text Animation
+
+            SizedBox(height: 10),
+
+            // Tagline
             TweenAnimationBuilder(
               tween: Tween<double>(begin: 0, end: 1),
               duration: Duration(seconds: 2),
@@ -79,13 +83,33 @@ class _SplashScreenState extends State<SplashScreen>
                 return Opacity(opacity: opacity, child: child);
               },
               child: Text(
-                " Manage and track home products",
+                "Track Your Grocery & Medicine Easily!",
                 style: myTextStyle18(
                   fontWeight: FontWeight.bold,
                   fontColor: Colors.black54,
                 ),
               ),
             ),
+
+            Spacer(),
+
+            // Bottom Tagline
+            TweenAnimationBuilder(
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: Duration(seconds: 2),
+              builder: (context, double opacity, child) {
+                return Opacity(opacity: opacity, child: child);
+              },
+              child: Text(
+                "Stay Fresh, Stay Healthy!",
+                style: myTextStyle18(
+                  fontWeight: FontWeight.bold,
+                  fontColor: Colors.black54,
+                  fontFamily: "secondary"
+                ),
+              ),
+            ),
+
             SizedBox(height: 40),
           ],
         ),
