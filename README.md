@@ -2,6 +2,27 @@
 
 A Flutter-based inventory management application designed to help users track product expiry dates and manage stock efficiently.
 
+## Screenshort
+<div>
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224307.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224423.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224507.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224516.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224523.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224604.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224627.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224652.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224703.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_224731.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250328_230522.png" height = 500 />
+   <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250329_003934.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250329_005639.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250329_005647.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250329_005728.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250329_010301.png" height = 500 />
+  <img src = "https://github.com/rahulkumardev24/SmartStock-ExpiryTracker/blob/master/Screenshot_20250329_010318.png" height = 500 />
+</div>
+
 ## Features
 
 - Track product expiry dates
@@ -24,7 +45,11 @@ A Flutter-based inventory management application designed to help users track pr
 - `intl`: ^0.20.2 (For date formatting)
 - `image_picker`: ^1.1.2
 - `hive`: ^2.2.3 (For local storage)
-
+- `path_provider`: ^2.1.2
+- `pat`h: ^1.8.3
+- `shared_preferences`: ^2.5.3
+- `hive_flutter`: ^1.1.0
+  
 ## Project Structure
 
 ```
