@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+
 
 class SearchBox extends StatelessWidget {
   final TextEditingController controller;

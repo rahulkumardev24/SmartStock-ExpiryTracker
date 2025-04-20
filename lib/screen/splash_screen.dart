@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smartstock/screen/dash_board_screen.dart';
-import 'package:smartstock/screen/get_start_screen.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
+
+import '../utils/custom_text_style.dart';
+import 'dash_board_screen.dart';
+import 'get_start_screen.dart';
+
 
 
 class SplashScreen extends StatefulWidget {

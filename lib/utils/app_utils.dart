@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/my_filled_button.dart';
-import 'package:smartstock/widgets/my_outline_button.dart';
+import '../widgets/my_filled_button.dart';
+import '../widgets/my_outline_button.dart';
+import 'colors.dart';
+import 'custom_text_style.dart';
 
 class AppUtils {
 

@@ -6,12 +6,8 @@
 // TypeAdapterGenerator
 // **************************************************************************
 
-
-
-
-
 import 'package:hive/hive.dart';
-import 'package:smartstock/models/item_model.dart';
+import 'item_model.dart';
 
 class ItemAdapter extends TypeAdapter<Item> {
   @override

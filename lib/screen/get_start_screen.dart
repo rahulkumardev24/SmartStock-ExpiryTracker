@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smartstock/screen/dash_board_screen.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/my_snack_message.dart';
-import 'package:smartstock/widgets/sliding_button.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import '../widgets/my_snack_message.dart';
+import '../widgets/sliding_button.dart';
+import 'dash_board_screen.dart';
 import 'home_screen.dart'; // Replace with your actual home screen file
 
 class GetStartedScreen extends StatefulWidget {

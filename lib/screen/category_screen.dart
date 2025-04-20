@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:smartstock/screen/grocery_screen.dart';
-import 'package:smartstock/screen/medicine_screen.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import 'grocery_screen.dart';
+import 'medicine_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});

@@ -1,4 +1,4 @@
-name: smartstock
+name: SmartExpiryTracker
 description: "A new Flutter project."
 publish_to: 'none'
 version: 1.0.0+1
@@ -14,10 +14,12 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   intl: ^0.20.2
   image_picker: ^1.1.2
+  hive: ^2.2.3
   hive_flutter: ^1.1.0
   path_provider: ^2.1.2
   path: ^1.8.3
   shared_preferences: ^2.5.3
+
 
 
 dev_dependencies:
@@ -26,6 +28,12 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   build_runner: ^2.4.8
   hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.14.3
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/logo.png"
+
 
 
 flutter:

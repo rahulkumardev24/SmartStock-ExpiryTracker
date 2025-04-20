@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:smartstock/models/item_model.dart';
-import 'package:smartstock/utils/app_utils.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/utils/custom_widgets.dart';
-import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'dart:io';
 
-import 'package:smartstock/widgets/my_snack_message.dart';
+import '../models/item_model.dart';
+import '../utils/app_utils.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import '../utils/custom_widgets.dart';
+import '../widgets/my_navigation_button.dart';
+import '../widgets/my_snack_message.dart';
+
+
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});

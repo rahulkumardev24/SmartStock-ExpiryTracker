@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:smartstock/models/item_model.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/my_list_card.dart';
-import 'package:smartstock/widgets/my_navigation_button.dart';
-import 'package:smartstock/screen/add_item_screen.dart';
+import '../models/item_model.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import '../widgets/my_list_card.dart';
+import '../widgets/my_navigation_button.dart';
+import 'add_item_screen.dart';
 
 
 class CategoryItemsScreen extends StatelessWidget {

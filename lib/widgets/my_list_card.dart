@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:smartstock/models/item_model.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/my_snack_message.dart';
+import '../models/item_model.dart';
 import '../utils/app_utils.dart';
+import '../utils/custom_text_style.dart';
 import '../utils/custom_widgets.dart';
-
 import '../widgets/expiry_indicator.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'my_snack_message.dart';
 
 class MyListCard extends StatelessWidget {
   final Item item;

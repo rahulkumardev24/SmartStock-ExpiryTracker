@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:smartstock/constant/app_constant.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/screen/category_items_screen.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
+import '../constant/app_constant.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import 'category_items_screen.dart';
 
 class GroceryScreen extends StatelessWidget {
   GroceryScreen({super.key});

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:smartstock/models/item_model.dart';
-import 'package:smartstock/screen/notification_screen.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/widgets/my_list_card.dart';
-import 'package:smartstock/widgets/my_navigation_button.dart';
-import 'package:smartstock/widgets/notification_badge.dart';
-import 'package:smartstock/widgets/search_box.dart';
+import '../models/item_model.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import '../widgets/my_list_card.dart';
+import '../widgets/my_navigation_button.dart';
+import '../widgets/notification_badge.dart';
+import '../widgets/search_box.dart';
+import 'notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   String userName;

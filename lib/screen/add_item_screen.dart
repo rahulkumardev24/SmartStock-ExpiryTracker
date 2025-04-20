@@ -4,15 +4,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:smartstock/constant/app_constant.dart';
-import 'package:smartstock/models/item_model.dart';
-import 'package:smartstock/utils/colors.dart';
-import 'package:smartstock/utils/custom_text_style.dart';
-import 'package:smartstock/utils/image_utils.dart';
-import 'package:smartstock/widgets/my_filled_button.dart';
-import 'package:smartstock/widgets/my_navigation_button.dart';
-import 'package:smartstock/widgets/my_outline_button.dart';
-import 'package:smartstock/widgets/my_snack_message.dart';
+
+import '../constant/app_constant.dart';
+import '../models/item_model.dart';
+import '../utils/colors.dart';
+import '../utils/custom_text_style.dart';
+import '../utils/image_utils.dart';
+import '../widgets/my_filled_button.dart';
+import '../widgets/my_navigation_button.dart';
+import '../widgets/my_outline_button.dart';
+import '../widgets/my_snack_message.dart';
+
 
 class AddItemScreen extends StatefulWidget {
   final String? prefilledCategory;
