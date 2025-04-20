@@ -10,11 +10,11 @@ class GroceryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      padding: const EdgeInsets.all(8),
+      gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 21,
+        crossAxisSpacing: 11,
+        childAspectRatio: 2/2.2,
       ),
       itemCount: AppConstant.items.length,
       itemBuilder: (context, index) {

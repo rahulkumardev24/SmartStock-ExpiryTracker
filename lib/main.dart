@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:smartstock/models/item_adapter.g.dart';
 import 'package:smartstock/models/item_model.dart';
@@ -8,6 +9,11 @@ import 'package:smartstock/screen/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  /// use for stop device orientation
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await Hive.initFlutter();
   Hive.registerAdapter(ItemAdapter());
   await Hive.openBox<Item>('items');

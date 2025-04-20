@@ -12,8 +12,8 @@ import 'package:smartstock/widgets/notification_badge.dart';
 import 'package:smartstock/widgets/search_box.dart';
 
 class HomeScreen extends StatefulWidget {
-  String userName ;
-   HomeScreen({super.key , required this.userName});
+  String userName;
+  HomeScreen({super.key, required this.userName});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -132,10 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
+                  /// --- notification button --- ///
                   SizedBox(
                     width: mqWidth * 0.11,
                     height: mqWidth * 0.11,
                     child: MyNavigationButton(
+                      heorTag: 100,
                       btnIcon: FontAwesomeIcons.bell,
                       onPressed: () {
                         Navigator.push(
@@ -232,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      /// --- All items --- ///
                       Row(
                         children: [
                           Text("All items", style: myTextStyle18()),
@@ -259,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
+                      /// --- short button --- ///
                       InkWell(
                         onTap: () {
                           setState(() {
@@ -286,7 +290,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-
             ValueListenableBuilder(
               valueListenable: Hive.box<Item>('items').listenable(),
               builder: (context, Box<Item> box, _) {
@@ -303,12 +306,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        SizedBox(height: mqHeight * 0.2),
                         FaIcon(
                           FontAwesomeIcons.boxOpen,
                           size: 64,
                           color: AppColors.main.withAlpha(100),
                         ),
-                        const SizedBox(height: 16),
+
                         Text(
                           'No items found',
                           style: myTextStyle18(

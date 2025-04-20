@@ -43,6 +43,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
     selectedCategoryType = widget.prefilledCategory ?? "";
     selectedItemType = widget.prefilledItemType ?? "";
   }
+  dispose() {
+    _quantityController.dispose();
+    _purchaseDateController.dispose();
+    _expiryDateController.dispose();
+    _itemNameController.dispose();
+    super.dispose();
+  }
 
   /// Custom Date Picker using Bottom Sheet
   Future<void> _showCustomDatePicker(TextEditingController controller) async {
@@ -203,99 +210,102 @@ class _AddItemScreenState extends State<AddItemScreen> {
       backgroundColor: Colors.white,
 
       /// ------ body ----- ///
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              /// Item Image
-              InkWell(
-                onTap: _showImagePickerOptions,
-                child: Container(
-                  height: mqHeight * 0.2,
-                  width: mqHeight * 0.2,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.secondary.withAlpha(90),
-                  ),
-                  child:
-                      selectedImage == null
-                          ? const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Center(
-                              child: Icon(
-                                Icons.add_a_photo_outlined,
-                                size: 100,
-                                color: Colors.black45,
+      body: GestureDetector(
+        onTap: ()=> FocusScope.of(context).unfocus(),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// Item Image
+                InkWell(
+                  onTap: _showImagePickerOptions,
+                  child: Container(
+                    height: mqHeight * 0.2,
+                    width: mqHeight * 0.2,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.secondary.withAlpha(90),
+                    ),
+                    child:
+                        selectedImage == null
+                            ? const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Center(
+                                child: Icon(
+                                  Icons.add_a_photo_outlined,
+                                  size: 100,
+                                  color: Colors.black45,
+                                ),
+                              ),
+                            )
+                            : ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                12,
+                              ), // Add rounded corners
+                              child: Image.file(
+                                File(selectedImage!),
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          )
-                          : ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              12,
-                            ), // Add rounded corners
-                            child: Image.file(
-                              File(selectedImage!),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                ),
-              ),
-
-              const SizedBox(height: 21),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Fill Details",
-                    style: myTextStyle18(
-                      fontColor: Colors.black45,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
-                ],
-              ),
-
-              /// item name
-              _buildInfoField("Item Name", _itemNameController),
-
-              /// Quantity
-              _buildInfoField("Quantity", _quantityController),
-
-              /// Item Type
-              if (widget.prefilledCategory == null)
-                _buildCategoryDropdownField("Item Categories"),
-
-              /// Item Categories
-              if (widget.prefilledItemType == null)
-                _buildItemTypeDropdownField("Item Type"),
-
-              /// Purchase Date (Custom Date Picker)
-              _buildDatePickerField("Purchased Date", _purchaseDateController),
-
-              /// Expiry Date (Custom Date Picker)
-              _buildDatePickerField("Expires on", _expiryDateController),
-
-              const SizedBox(height: 10),
-              Text(
-                "*Please confirm or change the expiry date as mentioned on the item!",
-                style: myTextStyle12(fontColor: Colors.black54),
-              ),
-              SizedBox(height: 12),
-
-              /// Add Item Button
-              SizedBox(
-                width: double.infinity,
-                child: MyFilledButton(
-                  btnText: "+ Add this item",
-                  btnBackground: AppColors.main,
-                  borderRadius: 8,
-                  /// here we add items
-                  onPressed: _saveItem,
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 21),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Fill Details",
+                      style: myTextStyle18(
+                        fontColor: Colors.black45,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+
+                /// item name
+                _buildInfoField("Item Name", _itemNameController),
+
+                /// Quantity
+                _buildInfoField("Quantity", _quantityController),
+
+                /// Item Type
+                if (widget.prefilledCategory == null)
+                  _buildCategoryDropdownField("Item Categories"),
+
+                /// Item Categories
+                if (widget.prefilledItemType == null)
+                  _buildItemTypeDropdownField("Item Type"),
+
+                /// Purchase Date (Custom Date Picker)
+                _buildDatePickerField("Purchased Date", _purchaseDateController),
+
+                /// Expiry Date (Custom Date Picker)
+                _buildDatePickerField("Expires on", _expiryDateController),
+
+                const SizedBox(height: 10),
+                Text(
+                  "*Please confirm or change the expiry date as mentioned on the item!",
+                  style: myTextStyle12(fontColor: Colors.black54),
+                ),
+                SizedBox(height: 12),
+
+                /// Add Item Button
+                SizedBox(
+                  width: double.infinity,
+                  child: MyFilledButton(
+                    btnText: "+ Add this item",
+                    btnBackground: AppColors.main,
+                    borderRadius: 8,
+                    /// here we add items
+                    onPressed: _saveItem,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -320,6 +330,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             Expanded(
               child: TextField(
                 style: myTextStyle18(fontColor: Colors.green , fontWeight: FontWeight.bold),
+                autofocus: false,
                 controller: controller,
                 textAlign: TextAlign.end,
                 decoration: InputDecoration(
@@ -712,14 +723,5 @@ class _AddItemScreenState extends State<AddItemScreen> {
       );
       Navigator.pop(context);
     }
-  }
-
-  @override
-  void dispose() {
-    _quantityController.dispose();
-    _purchaseDateController.dispose();
-    _expiryDateController.dispose();
-    _itemNameController.dispose();
-    super.dispose();
   }
 }

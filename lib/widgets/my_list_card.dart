@@ -14,11 +14,8 @@ class MyListCard extends StatelessWidget {
   final Item item;
   final Box<Item> box;
 
-  const MyListCard({
-    Key? key,
-    required this.item,
-    required this.box,
-  }) : super(key: key);
+  const MyListCard({Key? key, required this.item, required this.box})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +34,8 @@ class MyListCard extends StatelessWidget {
         child: const FaIcon(FontAwesomeIcons.trash, color: Colors.white),
       ),
       direction: DismissDirection.endToStart,
-      confirmDismiss: (direction) => AppUtils.confirmDelete(context, item.itemName),
+      confirmDismiss:
+          (direction) => AppUtils.confirmDelete(context, item.itemName),
       onDismissed: (direction) {
         box.deleteAt(box.values.toList().indexOf(item));
         MySnackMessage(
@@ -63,40 +61,39 @@ class MyListCard extends StatelessWidget {
             /// Item Image
             item.imagePath != null && item.imagePath!.isNotEmpty
                 ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.file(
-                  File(item.imagePath!),
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  height: MediaQuery.of(context).size.width * 0.3,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            )
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(item.imagePath!),
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      height: MediaQuery.of(context).size.width * 0.3,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
                 : _buildPlaceholderImage(context),
 
             /// --- Details --- ///
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(right: 8.0 , top: 8.0 , bottom: 8.0),
+                padding: const EdgeInsets.only(
+                  right: 8.0,
+                  top: 8.0,
+                  bottom: 8.0,
+                ),
                 child: Column(
                   children: [
+                    /// --- expiry badge --- ///
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CustomWidgets.expiryBadge(item.expiryDate),
-                      ],
+                      children: [CustomWidgets.expiryBadge(item.expiryDate)],
                     ),
                     Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            item.itemName,
-                            style: myTextStyle15(),
-                          ),
+                          child: Text(item.itemName, style: myTextStyle15()),
                         ),
-
                       ],
                     ),
                     Column(
@@ -108,12 +105,20 @@ class MyListCard extends StatelessWidget {
                           runSpacing: 8,
                           children: [
                             /// icon chip call
-                            CustomWidgets.InfoChip(FontAwesomeIcons.layerGroup, 'Qty: ${item.quantity}'),
-                            CustomWidgets.InfoChip(FontAwesomeIcons.tag, item.categoryType),
+                            CustomWidgets.InfoChip(
+                              FontAwesomeIcons.layerGroup,
+                              'Qty: ${item.quantity}',
+                            ),
+                            CustomWidgets.InfoChip(
+                              FontAwesomeIcons.tag,
+                              item.categoryType,
+                            ),
                             CustomWidgets.InfoChip(
                               FontAwesomeIcons.calendar,
                               'Expires: ${item.expiryDate}',
-                              isExpiringSoon: AppUtils.isExpiringSoon(item.expiryDate),
+                              isExpiringSoon: AppUtils.isExpiringSoon(
+                                item.expiryDate,
+                              ),
                             ),
                           ],
                         ),
@@ -124,7 +129,7 @@ class MyListCard extends StatelessWidget {
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

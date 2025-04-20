@@ -11,10 +11,10 @@ class MedicineScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.85,
+        childAspectRatio: 2/2.2,
         crossAxisSpacing: 21,
       ),
       itemCount: AppConstant.itemsMed.length,

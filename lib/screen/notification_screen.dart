@@ -6,6 +6,7 @@ import 'package:smartstock/utils/app_utils.dart';
 import 'package:smartstock/utils/colors.dart';
 import 'package:smartstock/utils/custom_text_style.dart';
 import 'package:smartstock/utils/custom_widgets.dart';
+import 'package:smartstock/widgets/my_navigation_button.dart';
 import 'dart:io';
 
 import 'package:smartstock/widgets/my_snack_message.dart';
@@ -53,11 +54,11 @@ class _NotificationScreenState extends State<NotificationScreen>
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           color:
-          isExpired
-              ? Colors.red.shade100.withAlpha(100)
-              : (isExpired == false
-              ? Colors.orange.shade100.withAlpha(100)
-              : Color(0xff80BCBD).withAlpha(50)),
+              isExpired
+                  ? Colors.red.shade100.withAlpha(100)
+                  : (isExpired == false
+                      ? Colors.orange.shade100.withAlpha(100)
+                      : Color(0xff80BCBD).withAlpha(50)),
 
           borderRadius: BorderRadius.circular(12),
         ),
@@ -66,37 +67,37 @@ class _NotificationScreenState extends State<NotificationScreen>
             /// Item Image
             item.imagePath != null && item.imagePath!.isNotEmpty
                 ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.file(
-                  File(item.imagePath!),
-                  width: MediaQuery.of(context).size.width * 0.2,
-                  height: MediaQuery.of(context).size.width * 0.2,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            )
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(item.imagePath!),
+                      width: MediaQuery.of(context).size.width * 0.2,
+                      height: MediaQuery.of(context).size.width * 0.2,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                )
                 : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.2,
-                height: MediaQuery.of(context).size.width * 0.2,
-                decoration: BoxDecoration(
-                  color: const Color(0xff80BCBD).withAlpha(50),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: FaIcon(
-                    item.categoryType.toLowerCase() == 'grocery'
-                        ? FontAwesomeIcons.basketShopping
-                        : FontAwesomeIcons.capsules,
-                    color: const Color(0xff80BCBD),
-                    size: MediaQuery.of(context).size.width * 0.15,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.2,
+                    height: MediaQuery.of(context).size.width * 0.2,
+                    decoration: BoxDecoration(
+                      color: const Color(0xff80BCBD).withAlpha(50),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: FaIcon(
+                        item.categoryType.toLowerCase() == 'grocery'
+                            ? FontAwesomeIcons.basketShopping
+                            : FontAwesomeIcons.capsules,
+                        color: const Color(0xff80BCBD),
+                        size: MediaQuery.of(context).size.width * 0.15,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
             /// --- Details --- ///
             Expanded(
@@ -127,7 +128,10 @@ class _NotificationScreenState extends State<NotificationScreen>
                               FontAwesomeIcons.layerGroup,
                               'Qty: ${item.quantity}',
                             ),
-                            CustomWidgets.InfoChip(FontAwesomeIcons.tag, item.categoryType),
+                            CustomWidgets.InfoChip(
+                              FontAwesomeIcons.tag,
+                              item.categoryType,
+                            ),
                           ],
                         ),
                       ],
@@ -146,9 +150,20 @@ class _NotificationScreenState extends State<NotificationScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      /// --- appbar --- /// 
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: MyNavigationButton(
+            btnIcon: Icons.arrow_back_ios_rounded,
+            btnBackground: Colors.black12,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
         title: Text(
           "Notifications",
           style: myTextStyle18(fontWeight: FontWeight.bold),
@@ -156,7 +171,7 @@ class _NotificationScreenState extends State<NotificationScreen>
         bottom: TabBar(
           controller: _tabController,
           labelStyle: myTextStyle18(),
-          tabs: const [Tab(text: 'Expiring Soon'), Tab(text: 'Expired')],
+          tabs:  [Tab(text: 'Expiring Soon'), Tab(text: 'Expired')],
           labelColor: AppColors.main,
 
           unselectedLabelColor: Colors.grey,
@@ -177,19 +192,48 @@ class _NotificationScreenState extends State<NotificationScreen>
     return ValueListenableBuilder(
       valueListenable: Hive.box<Item>('items').listenable(),
       builder: (context, Box<Item> box, _) {
-        final items = box.values.where((item) {
-          final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
-          return isExpired ? daysLeft < 0 : daysLeft >= 0 && daysLeft <= 7;
-        }).toList().reversed.toList();
+        final items =
+            box.values
+                .where((item) {
+                  final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
+                  return isExpired
+                      ? daysLeft < 0
+                      : daysLeft >= 0 && daysLeft <= 2;
+                })
+                .toList()
+                .reversed
+                .toList();
         return items.isEmpty
-            ? Center(child: Text(isExpired ? 'No expired items' : 'No items expiring soon'))
+            ? Center(
+              child:  isExpired ?  Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(FontAwesomeIcons.basketShopping , size: 100, color: Colors.red.shade100,),
+                  SizedBox(height: 10,),
+                  Text(
+                   'No expired items',
+                    style: myTextStyle18(fontColor: Colors.black54),
+                  ),
+                ],
+              ) : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(FontAwesomeIcons.basketShopping , size: 100, color: Colors.yellow.shade100,),
+                  SizedBox(height: 10,),
+                  Text(
+                    'No expire soon items',
+                    style: myTextStyle18(fontColor: Colors.black54),
+                  ),
+                ],
+              ),
+            )
             : ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return notificationItemCard(items[index], box , isExpired);
-          },
-        );
+              padding: const EdgeInsets.all(16),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                return notificationItemCard(items[index], box, isExpired);
+              },
+            );
       },
     );
   }

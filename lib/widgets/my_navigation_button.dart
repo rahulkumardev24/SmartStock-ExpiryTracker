@@ -6,6 +6,7 @@ class MyNavigationButton extends StatefulWidget {
   double? iconSize ;
   VoidCallback onPressed ;
   double? btnRadius ;
+  dynamic? heorTag ;
   
   MyNavigationButton({super.key , 
      this.btnBackground = Colors.white,
@@ -13,7 +14,8 @@ class MyNavigationButton extends StatefulWidget {
     required this.btnIcon ,
     required this.onPressed ,
     this.iconSize = 18 ,
-    this.btnRadius = 21
+    this.btnRadius = 21 ,
+    this.heorTag,
   });
 
   @override
@@ -23,7 +25,9 @@ class MyNavigationButton extends StatefulWidget {
 class _MyNavigationButtonState extends State<MyNavigationButton> {
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(onPressed: widget.onPressed ,
+    return FloatingActionButton(
+      heroTag: widget.heorTag,
+      onPressed: widget.onPressed ,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation:0,
       backgroundColor: widget.btnBackground,
