@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item_model.dart';
+import '../service/local_notification_service.dart';
+import '../utils/app_utils.dart';
 import '../utils/colors.dart';
 import '../utils/custom_text_style.dart';
 import '../widgets/my_list_card.dart';
@@ -44,7 +47,38 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     searchController.addListener(_filterItems);
+    _checkAndShowExpiryNotifications();
   }
+
+  void _checkAndShowExpiryNotifications() async {
+    final box = Hive.box<Item>('items');
+
+    // Load shown items from a local Hive box or SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final shownItems = prefs.getStringList('shownNotifications') ?? [];
+
+    int notificationId = 0;
+
+    for (var item in box.values) {
+      if (AppUtils.isExpiringSoon(item.expiryDate) &&
+          !shownItems.contains(item.itemName)) {
+
+        // Show notification
+        await NotificationService.showExpiryNotification(
+          item.itemName,
+          item.expiryDate,
+          id: notificationId++,
+        );
+
+        // Mark this item as shown
+        shownItems.add(item.itemName);
+      }
+    }
+
+    // Save updated shown notifications
+    await prefs.setStringList('shownNotifications', shownItems);
+  }
+
 
   @override
   void dispose() {
@@ -262,6 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
+
                       /// --- short button --- ///
                       InkWell(
                         onTap: () {

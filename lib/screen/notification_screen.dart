@@ -11,8 +11,6 @@ import '../utils/custom_widgets.dart';
 import '../widgets/my_navigation_button.dart';
 import '../widgets/my_snack_message.dart';
 
-
-
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
@@ -152,7 +150,8 @@ class _NotificationScreenState extends State<NotificationScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      /// --- appbar --- /// 
+
+      /// --- appbar --- ///
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -173,7 +172,7 @@ class _NotificationScreenState extends State<NotificationScreen>
         bottom: TabBar(
           controller: _tabController,
           labelStyle: myTextStyle18(),
-          tabs:  [Tab(text: 'Expiring Soon'), Tab(text: 'Expired')],
+          tabs: [Tab(text: 'Expiring Soon'), Tab(text: 'Expired')],
           labelColor: AppColors.main,
 
           unselectedLabelColor: Colors.grey,
@@ -200,34 +199,45 @@ class _NotificationScreenState extends State<NotificationScreen>
                   final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
                   return isExpired
                       ? daysLeft < 0
-                      : daysLeft >= 0 && daysLeft <= 2;
+                      : daysLeft >= 0 && daysLeft <= 3;
                 })
                 .toList()
                 .reversed
                 .toList();
         return items.isEmpty
             ? Center(
-              child:  isExpired ?  Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(FontAwesomeIcons.basketShopping , size: 100, color: Colors.red.shade100,),
-                  SizedBox(height: 10,),
-                  Text(
-                   'No expired items',
-                    style: myTextStyle18(fontColor: Colors.black54),
-                  ),
-                ],
-              ) : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(FontAwesomeIcons.basketShopping , size: 100, color: Colors.yellow.shade100,),
-                  SizedBox(height: 10,),
-                  Text(
-                    'No expire soon items',
-                    style: myTextStyle18(fontColor: Colors.black54),
-                  ),
-                ],
-              ),
+              child:
+                  isExpired
+                      ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.basketShopping,
+                            size: 100,
+                            color: Colors.red.shade100,
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'No expired items',
+                            style: myTextStyle18(fontColor: Colors.black54),
+                          ),
+                        ],
+                      )
+                      : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            FontAwesomeIcons.basketShopping,
+                            size: 100,
+                            color: Colors.yellow.shade100,
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'No expire soon items',
+                            style: myTextStyle18(fontColor: Colors.black54),
+                          ),
+                        ],
+                      ),
             )
             : ListView.builder(
               padding: const EdgeInsets.all(16),
