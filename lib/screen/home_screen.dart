@@ -47,38 +47,87 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     searchController.addListener(_filterItems);
-    _checkAndShowExpiryNotifications();
+    scheduleNotificationsForExpiringItems();
+    // scheduleNotificationsForTesting();
   }
 
-  void _checkAndShowExpiryNotifications() async {
+  void scheduleNotificationsForExpiringItems() async {
     final box = Hive.box<Item>('items');
-
-    // Load shown items from a local Hive box or SharedPreferences
-    final prefs = await SharedPreferences.getInstance();
-    final shownItems = prefs.getStringList('shownNotifications') ?? [];
-
-    int notificationId = 0;
+    final now = DateTime.now();
 
     for (var item in box.values) {
-      if (AppUtils.isExpiringSoon(item.expiryDate) &&
-          !shownItems.contains(item.itemName)) {
+      if (AppUtils.isExpiringSoon(item.expiryDate)) {
+        final expiryDate = DateFormat('dd MMM yyyy').parse(item.expiryDate);
 
-        // Show notification
-        await NotificationService.showExpiryNotification(
-          item.itemName,
-          item.expiryDate,
-          id: notificationId++,
-        );
+        // Schedule notifications for 3 days before expiry (if future date)
+        for (int i = 3; i >= 1; i--) {
+          final notifyDate = expiryDate.subtract(Duration(days: i));
+          if (notifyDate.isAfter(now)) {
+            await NotificationService.scheduleNotification(
+              title: '⚠️ Expiry Alert: ${item.itemName}',
+              body:
+                  '${item.itemName} is expiring in $i day${i > 1 ? "s" : ""}!',
+              scheduledDateTime: notifyDate.add(
+                Duration(hours: 9),
+              ), // 9 AM daily
+            );
+          }
+        }
 
-        // Mark this item as shown
-        shownItems.add(item.itemName);
+        // Optionally: Same day notification if still not expired
+        if (expiryDate.isAfter(now)) {
+          await NotificationService.scheduleNotification(
+            title: '⚠️ Expiry Alert: ${item.itemName}',
+            body: '${item.itemName} expires today!',
+            scheduledDateTime: expiryDate.add(Duration(hours: 9)),
+          );
+        }
       }
     }
-
-    // Save updated shown notifications
-    await prefs.setStringList('shownNotifications', shownItems);
   }
 
+  /// ---- notification testing --- ///
+  /*
+
+  void scheduleNotificationsForTesting() async {
+    final box = Hive.box<Item>('items');
+    final now = DateTime.now();
+
+    for (var item in box.values) {
+      if (AppUtils.isExpiringSoon(item.expiryDate)) {
+        final expiryDate = DateFormat('dd MMM yyyy').parse(item.expiryDate);
+
+        // ✅ Only if expiryDate is today
+        if (expiryDate.year == now.year &&
+            expiryDate.month == now.month &&
+            expiryDate.day == now.day) {
+
+          // 🔔 Set testing time to 2:25 PM today
+          final scheduledTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            15, // 2 PM
+            5, // 25 minutes
+          );
+
+          if (scheduledTime.isAfter(now)) {
+            await NotificationService.scheduleNotification(
+              title: '🧪 Testing Notification: ${item.itemName}',
+              body: '${item.itemName} is expiring today!',
+              scheduledDateTime: scheduledTime,
+            );
+
+            print('✅ Test notification scheduled for ${item.itemName} at $scheduledTime');
+          } else {
+            print('⏱ Scheduled time already passed. Skipping ${item.itemName}');
+          }
+        }
+      }
+    }
+  }
+
+*/
 
   @override
   void dispose() {

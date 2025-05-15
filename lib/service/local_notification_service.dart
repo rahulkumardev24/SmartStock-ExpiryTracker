@@ -6,12 +6,47 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  /// --- get notification permission
+  static Future<void> scheduleNotification({
+    required String title,
+    required String body,
+    required DateTime scheduledDateTime,
+  }) async {
+    await _notificationsPlugin.zonedSchedule(
+      0,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledDateTime, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channel_id_1',
+          'Default Channel',
+          channelDescription: 'Used for scheduled notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  static Future<void> openExactAlarmSettings() async {
+    if (Platform.isAndroid) {
+      final intent = AndroidIntent(
+        action: 'android.settings.REQUEST_SCHEDULE_EXACT_ALARM',
+        flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+      );
+      await intent.launch();
+    }
+  }
+
   static Future<void> initialize() async {
     /// Initialize timezone
     tz.initializeTimeZones();
@@ -41,18 +76,6 @@ class NotificationService {
     }
   }
 
-  /// --- open notification settings
-  static Future<void> openExactAlarmSettings() async {
-    if (Platform.isAndroid) {
-      final intent = AndroidIntent(
-        action: 'android.settings.REQUEST_SCHEDULE_EXACT_ALARM',
-        flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
-      );
-      await intent.launch();
-    }
-  }
-
-  /// --- request notification permission
   static Future<void> _requestNotificationPermissions() async {
     // Request Notification Permission (Android 13+)
     if (Platform.isAndroid) {
@@ -79,7 +102,6 @@ class NotificationService {
     }
   }
 
-  /// --- check notification permission
   // Helper method to check if exact alarm permission is needed
   static Future<bool> _isExactAlarmPermissionRequired() async {
     if (Platform.isAndroid) {
@@ -89,7 +111,6 @@ class NotificationService {
     return false;
   }
 
-  /// --- check exact alarm permission
   // Helper method to check if exact alarm permission is granted
   static Future<bool> _checkExactAlarmPermission() async {
     if (Platform.isAndroid) {
@@ -99,32 +120,5 @@ class NotificationService {
       }
     }
     return true; // For versions that don't require this permission
-  }
-
-  /// ------------- show Expiry Notifications ------------------------- ///
-
-  static Future<void> showExpiryNotification(
-    String itemName,
-    String expiryDate, {
-    required int id,
-  }) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-          'expiry_channel',
-          'Expiring Soon',
-          importance: Importance.max,
-          priority: Priority.high,
-        );
-
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidDetails,
-    );
-
-    await _notificationsPlugin.show(
-      id, // ✅ Use unique ID
-      '$itemName is expiring soon!',
-      'Expires on $expiryDate',
-      notificationDetails,
-    );
   }
 }
