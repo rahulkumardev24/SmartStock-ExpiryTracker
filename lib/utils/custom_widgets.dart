@@ -7,48 +7,56 @@ import 'custom_text_style.dart';
 
 
 class CustomWidgets{
-
-  /// expiry badge
+  /// Expiry badge with better date handling
   static Widget expiryBadge(String expiryDate) {
-    final daysLeft = AppUtils.getDaysLeft(expiryDate);
-    String expiryText = AppUtils.getExpiryText(expiryDate);
+    try {
+      final daysLeft = AppUtils.getDaysLeft(expiryDate);
+      String expiryText = AppUtils.getExpiryText(expiryDate);
 
-    Color badgeColor;
-    if (daysLeft < 0) {
-      badgeColor = Colors.red;
-    } else if (daysLeft <= 1) {
-      badgeColor = Colors.orange;
-    } else {
-      badgeColor = Colors.green;
+      Color badgeColor;
+      IconData icon;
+
+      if (daysLeft < 0) {
+        badgeColor = Colors.red;
+        icon = FontAwesomeIcons.circleXmark;
+      } else if (daysLeft == 0) {
+        badgeColor = Colors.orange;
+        icon = FontAwesomeIcons.circleExclamation;
+      } else if (daysLeft <= 3) {
+        badgeColor = Colors.orange;
+        icon = FontAwesomeIcons.triangleExclamation;
+      } else {
+        badgeColor = Colors.green;
+        icon = FontAwesomeIcons.circleCheck;
+      }
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: badgeColor.withAlpha(40),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: badgeColor.withAlpha(80)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FaIcon(icon, size: 12, color: badgeColor),
+            const SizedBox(width: 4),
+            Text(
+              expiryText,
+              style: myTextStyle12(
+                fontColor: badgeColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error creating expiry badge: $e');
+      return const SizedBox(); // Fallback widget
     }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: badgeColor.withAlpha(40),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: badgeColor.withAlpha(80)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FaIcon(
-            daysLeft < 0
-                ? FontAwesomeIcons.circleXmark
-                : FontAwesomeIcons.triangleExclamation,
-            color: badgeColor,
-            size: 12,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            expiryText,
-            style: myTextStyle12(fontColor: badgeColor, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
   }
-
 
   /// infoChip
   static Widget InfoChip(

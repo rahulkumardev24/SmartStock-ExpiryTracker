@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,29 +13,74 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static Future<void> scheduleNotification({
+  static Future<void> scheduleDailyNotifications({
     required int id,
     required String title,
     required String body,
-    required DateTime scheduledDateTime,
+    required DateTime firstNotificationDate,
+    required int daysUntilExpiry,
   }) async {
-    await _notificationsPlugin.zonedSchedule(
-      id,
+    try {
+      final now = DateTime.now();
+
+      for (int daysLeft = daysUntilExpiry; daysLeft >= 0; daysLeft--) {
+        final notificationTime = firstNotificationDate.add(
+          Duration(days: daysUntilExpiry - daysLeft),
+        );
+
+        // Skip past notifications
+        if (notificationTime.isBefore(now)) continue;
+
+        String notificationBody;
+        if (daysLeft == 0) {
+          notificationBody = '❗ $title expires TODAY!';
+        } else if (daysLeft == 1) {
+          notificationBody = '⚠️ $title expires tomorrow!';
+        } else {
+          notificationBody = '🔔 $title expires in $daysLeft days';
+        }
+
+        await _notificationsPlugin.zonedSchedule(
+          id + daysLeft,
+          title,
+          notificationBody,
+          tz.TZDateTime.from(notificationTime, tz.local),
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'expiry_channel_id',
+              'Expiry Alerts',
+              channelDescription: 'Notifications for expiring items',
+              importance: Importance.max,
+              priority: Priority.high,
+              playSound: true,
+            ),
+          ),
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        );
+
+        debugPrint('✅ Scheduled notification for $notificationTime');
+      }
+    } catch (e) {
+      debugPrint('❌ Error scheduling notification: $e');
+    }
+  }
+
+  static Future<void> showInstantNotification({
+    required String title,
+    required String body,
+  }) async {
+    await _notificationsPlugin.show(
+      0,
       title,
       body,
-      tz.TZDateTime.from(scheduledDateTime, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'channel_id_1',
-          'Default Channel',
-          channelDescription: 'Used for scheduled notifications',
+          'expiry_channel_id',
+          'Expiry Alerts',
           importance: Importance.max,
           priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 
@@ -49,32 +95,33 @@ class NotificationService {
   }
 
   static Future<void> initialize() async {
-    /// Initialize timezone
     tz.initializeTimeZones();
 
-    /// Initialize notification plugin
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings settings = InitializationSettings(
-      android: androidSettings,
+    // Set up notification channel for Android 8.0+
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'expiry_channel_id',
+      'Expiry Alerts',
+      importance: Importance.max,
+      sound: RawResourceAndroidNotificationSound('notification'),
     );
-    await _notificationsPlugin.initialize(settings);
 
-    /// Check if this is the first launch
-    final prefs = await SharedPreferences.getInstance();
-    bool isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
+    // Initialize plugin
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    if (isFirstLaunch) {
-      // Request permissions on first launch
-      await _requestNotificationPermissions();
-      await prefs.setBool('is_first_launch', false);
-    } else {
-      // For subsequent launches, check if permissions were denied before
-      if (await Permission.notification.isDenied) {
-        // Optionally show a rationale before requesting again
-        await _requestNotificationPermissions();
-      }
-    }
+    await _notificationsPlugin.initialize(
+      const InitializationSettings(android: initializationSettingsAndroid),
+      onDidReceiveNotificationResponse: (details) {
+        // Handle notification tap
+      },
+    );
+
+    // Create channel (Android 8.0+)
+    await _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(channel);
   }
 
   static Future<void> _requestNotificationPermissions() async {
@@ -121,5 +168,10 @@ class NotificationService {
       }
     }
     return true; // For versions that don't require this permission
+  }
+
+  // Add this method
+  static Future<void> cancelAllNotifications() async {
+    await _notificationsPlugin.cancelAll();
   }
 }

@@ -40,37 +40,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
   String selectedCategoryType = "";
   String selectedItemType = "";
 
-  void scheduleNotificationForItem(Item item) async {
-    final now = DateTime.now();
-    final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
-
-    if (daysLeft >= 0 && daysLeft <= 3) {
-      final scheduledTime = DateTime(now.year, now.month, now.day, 16, 18);
-
-      if (scheduledTime.isAfter(now)) {
-        String body;
-        if (daysLeft == 0) {
-          body = '${item.itemName} expires today!';
-        } else if (daysLeft == 1) {
-          body = '${item.itemName} is expiring tomorrow!';
-        } else {
-          body = '${item.itemName} is expiring in $daysLeft days!';
-        }
-
-        await NotificationService.scheduleNotification(
-          id: '${item.itemName}_$daysLeft'.hashCode,
-          title: '⚠️ Expiry Alert: ${item.itemName}',
-          body: body,
-          scheduledDateTime: scheduledTime,
-        );
-
-        print(
-          '✅ Scheduled notification for newly added ${item.itemName} at $scheduledTime',
-        );
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -733,6 +702,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
   /// Save item to Hive database
   Future<void> _saveItem() async {
+    // Validate all required fields are filled
     if (_itemNameController.text.isEmpty ||
         _quantityController.text.isEmpty ||
         _purchaseDateController.text.isEmpty ||
@@ -751,27 +721,130 @@ class _AddItemScreenState extends State<AddItemScreen> {
       return;
     }
 
-    final item = Item(
-      itemName: _itemNameController.text,
-      quantity: _quantityController.text,
-      purchaseDate: _purchaseDateController.text,
-      expiryDate: _expiryDateController.text,
-      imagePath: selectedImage,
-      categoryType: selectedCategoryType,
-      itemType: selectedItemType,
-    );
+    try {
+      // Parse dates using the correct format (matches what's shown in the UI)
+      final purchaseDate = DateFormat(
+        'dd MMM yyyy',
+      ).parse(_purchaseDateController.text);
+      final expiryDate = DateFormat(
+        'dd MMM yyyy',
+      ).parse(_expiryDateController.text);
 
-    final box = await Hive.openBox<Item>('items');
-    await box.add(item);
+      // Create item with dates stored in consistent ISO format (yyyy-MM-dd)
+      final item = Item(
+        itemName: _itemNameController.text,
+        quantity: _quantityController.text,
+        purchaseDate: DateFormat('yyyy-MM-dd').format(purchaseDate),
+        expiryDate: DateFormat('yyyy-MM-dd').format(expiryDate),
+        imagePath: selectedImage,
+        categoryType: selectedCategoryType,
+        itemType: selectedItemType,
+      );
 
-    /// ✅ Schedule notification for newly added item
-    scheduleNotificationForItem(item);
+      // Save to Hive
+      final box = await Hive.openBox<Item>('items');
+      await box.add(item);
 
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Item added successfully')));
-      Navigator.pop(context);
+      try {
+        final expiryDate = _parseExpiryDate(item.expiryDate);
+        final now = DateTime.now();
+        final daysLeft =
+            expiryDate
+                .difference(DateTime(now.year, now.month, now.day))
+                .inDays;
+
+        if (daysLeft <= 3) {
+          DateTime notificationTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            10,
+            0,
+          ); // सुबह 10 बजे
+          if (notificationTime.isBefore(now)) {
+            notificationTime = notificationTime.add(Duration(days: 1));
+          }
+
+          await NotificationService.scheduleDailyNotifications(
+            id: item.itemName.hashCode,
+            title: '⚠️ Expiry Alert: ${item.itemName}',
+            body:
+                'Your ${item.itemName} is expiring ${daysLeft == 0 ? 'today' : 'in $daysLeft days'}!',
+            firstNotificationDate: notificationTime,
+            daysUntilExpiry: daysLeft,
+          );
+        }
+      } catch (e) {
+        debugPrint('Error scheduling notification for new item: $e');
+      }
+
+      // Calculate days until expiry
+      final now = DateTime.now();
+      final daysLeft =
+          expiryDate.difference(DateTime(now.year, now.month, now.day)).inDays;
+
+      // Only schedule notifications if the item hasn't expired yet
+      if (daysLeft >= 0) {
+        // Calculate the first notification time (10 AM today or tomorrow if it's already past 10 AM)
+        DateTime firstNotificationTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          10, // 10 AM
+        );
+
+        // If it's already past 10 AM today, schedule for 10 AM tomorrow
+        if (firstNotificationTime.isBefore(now)) {
+          firstNotificationTime = firstNotificationTime.add(
+            const Duration(days: 1),
+          );
+        }
+
+        // Only schedule notification if expiry is within 3 days
+        if (daysLeft <= 3) {
+          await NotificationService.scheduleDailyNotifications(
+            id: item.itemName.hashCode,
+            title: '⚠️ Expiry Alert: ${item.itemName}',
+            body:
+                'Your ${item.itemName} will expire in $daysLeft day${daysLeft == 1 ? '' : 's'}',
+            firstNotificationDate: firstNotificationTime,
+            daysUntilExpiry: daysLeft,
+          );
+        }
+      }
+
+      // Show success message and return
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Item added successfully')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      // Handle any errors during date parsing or saving
+      if (mounted) {
+        MySnackMessage(
+          message: 'Error saving item: ${e.toString()}',
+          backgroundColor: Colors.red.shade400,
+          actionLabel: "Ok",
+          labelTextColor: Colors.black54,
+        ).show(context);
+      }
+      debugPrint('Error saving item: $e');
+    }
+  }
+
+  DateTime _parseExpiryDate(String expiryDate) {
+    try {
+      if (expiryDate.contains('-')) {
+        return DateFormat('yyyy-MM-dd').parse(expiryDate);
+      } else if (expiryDate.contains(' ')) {
+        return DateFormat('dd MMM yyyy').parse(expiryDate);
+      }
+      return DateTime.parse(expiryDate);
+    } catch (e) {
+      debugPrint('Error parsing date: $e');
+      return DateTime.now().add(const Duration(days: 1));
     }
   }
 }

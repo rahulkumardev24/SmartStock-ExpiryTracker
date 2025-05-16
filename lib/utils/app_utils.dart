@@ -48,26 +48,30 @@ class AppUtils {
         false;
   }
 
-  /// how many date left
+  /// Date parsing helper
+  static DateTime _parseDate(String dateStr) {
+    try {
+      // Try multiple formats
+      if (dateStr.contains('-')) {
+        return DateFormat('yyyy-MM-dd').parse(dateStr);
+      } else if (dateStr.contains(' ')) {
+        return DateFormat('dd MMM yyyy').parse(dateStr);
+      }
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      debugPrint('Error parsing date: $dateStr - $e');
+      return DateTime.now().add(const Duration(days: 1)); // Fallback
+    }
+  }
+
+  /// Calculate days left
   static int getDaysLeft(String expiryDate) {
     try {
-      final expiry = DateFormat('dd MMM yyyy').parse(expiryDate);
-      final now = DateTime.now().copyWith(
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-        microsecond: 0,
-      );
-      final expiryDay = expiry.copyWith(
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-        microsecond: 0,
-      );
-      return expiryDay.difference(now).inDays;
+      final expiry = _parseDate(expiryDate);
+      final now = DateTime.now();
+      return expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
     } catch (e) {
+      debugPrint('Error calculating days left: $e');
       return 0;
     }
   }
@@ -90,5 +94,4 @@ class AppUtils {
     final daysLeft = getDaysLeft(expiryDate);
     return daysLeft >= 0 && daysLeft <= 30;
   }
-
 }
