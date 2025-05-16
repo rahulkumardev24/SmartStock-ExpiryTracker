@@ -13,12 +13,13 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> scheduleNotification({
+    required int id,
     required String title,
     required String body,
     required DateTime scheduledDateTime,
   }) async {
     await _notificationsPlugin.zonedSchedule(
-      0,
+      id,
       title,
       body,
       tz.TZDateTime.from(scheduledDateTime, tz.local),

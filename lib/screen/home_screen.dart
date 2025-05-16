@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/item_model.dart';
 import '../service/local_notification_service.dart';
 import '../utils/app_utils.dart';
@@ -48,38 +47,39 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     searchController.addListener(_filterItems);
     scheduleNotificationsForExpiringItems();
-    // scheduleNotificationsForTesting();
+
   }
 
+  /// --- notification --- ///
   void scheduleNotificationsForExpiringItems() async {
     final box = Hive.box<Item>('items');
     final now = DateTime.now();
 
     for (var item in box.values) {
-      if (AppUtils.isExpiringSoon(item.expiryDate)) {
-        final expiryDate = DateFormat('dd MMM yyyy').parse(item.expiryDate);
+      final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
 
-        // Schedule notifications for 3 days before expiry (if future date)
-        for (int i = 3; i >= 1; i--) {
-          final notifyDate = expiryDate.subtract(Duration(days: i));
-          if (notifyDate.isAfter(now)) {
-            await NotificationService.scheduleNotification(
-              title: '⚠️ Expiry Alert: ${item.itemName}',
-              body:
-                  '${item.itemName} is expiring in $i day${i > 1 ? "s" : ""}!',
-              scheduledDateTime: notifyDate.add(
-                Duration(hours: 9),
-              ), // 9 AM daily
-            );
+      /// Sirf wahi items jinme 0 se 3 din bache hain
+      if (daysLeft >= 0 && daysLeft <= 3) {
+        final scheduledTime = DateTime(now.year, now.month, now.day, 16 , 18);
+
+        if (scheduledTime.isAfter(now)) {
+          String body;
+          if (daysLeft == 0) {
+            body = '${item.itemName} expires today!';
+          } else if (daysLeft == 1) {
+            body = '${item.itemName} is expiring tomorrow!';
+          } else {
+            body = '${item.itemName} is expiring in $daysLeft days!';
           }
-        }
-
-        // Optionally: Same day notification if still not expired
-        if (expiryDate.isAfter(now)) {
           await NotificationService.scheduleNotification(
+            id: '${item.itemName}_$daysLeft'.hashCode,
             title: '⚠️ Expiry Alert: ${item.itemName}',
-            body: '${item.itemName} expires today!',
-            scheduledDateTime: expiryDate.add(Duration(hours: 9)),
+            body: body,
+            scheduledDateTime: scheduledTime,
+          );
+
+          print(
+            '✅ Scheduled [$daysLeft days left] notification for ${item.itemName} at $scheduledTime',
           );
         }
       }

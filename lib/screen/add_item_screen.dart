@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 
 import '../constant/app_constant.dart';
 import '../models/item_model.dart';
+import '../service/local_notification_service.dart';
+import '../utils/app_utils.dart';
 import '../utils/colors.dart';
 import '../utils/custom_text_style.dart';
 import '../utils/image_utils.dart';
@@ -14,7 +16,6 @@ import '../widgets/my_filled_button.dart';
 import '../widgets/my_navigation_button.dart';
 import '../widgets/my_outline_button.dart';
 import '../widgets/my_snack_message.dart';
-
 
 class AddItemScreen extends StatefulWidget {
   final String? prefilledCategory;
@@ -39,12 +40,44 @@ class _AddItemScreenState extends State<AddItemScreen> {
   String selectedCategoryType = "";
   String selectedItemType = "";
 
+  void scheduleNotificationForItem(Item item) async {
+    final now = DateTime.now();
+    final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
+
+    if (daysLeft >= 0 && daysLeft <= 3) {
+      final scheduledTime = DateTime(now.year, now.month, now.day, 16, 18);
+
+      if (scheduledTime.isAfter(now)) {
+        String body;
+        if (daysLeft == 0) {
+          body = '${item.itemName} expires today!';
+        } else if (daysLeft == 1) {
+          body = '${item.itemName} is expiring tomorrow!';
+        } else {
+          body = '${item.itemName} is expiring in $daysLeft days!';
+        }
+
+        await NotificationService.scheduleNotification(
+          id: '${item.itemName}_$daysLeft'.hashCode,
+          title: '⚠️ Expiry Alert: ${item.itemName}',
+          body: body,
+          scheduledDateTime: scheduledTime,
+        );
+
+        print(
+          '✅ Scheduled notification for newly added ${item.itemName} at $scheduledTime',
+        );
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     selectedCategoryType = widget.prefilledCategory ?? "";
     selectedItemType = widget.prefilledItemType ?? "";
   }
+
   dispose() {
     _quantityController.dispose();
     _purchaseDateController.dispose();
@@ -181,7 +214,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
     if (pickedImage != null) {
       // Save image permanently
-      final permanentPath = await ImageUtils.saveImagePermanently(pickedImage.path);
+      final permanentPath = await ImageUtils.saveImagePermanently(
+        pickedImage.path,
+      );
       setState(() {
         selectedImage = permanentPath;
       });
@@ -213,7 +248,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
       /// ------ body ----- ///
       body: GestureDetector(
-        onTap: ()=> FocusScope.of(context).unfocus(),
+        onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -283,7 +318,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   _buildItemTypeDropdownField("Item Type"),
 
                 /// Purchase Date (Custom Date Picker)
-                _buildDatePickerField("Purchased Date", _purchaseDateController),
+                _buildDatePickerField(
+                  "Purchased Date",
+                  _purchaseDateController,
+                ),
 
                 /// Expiry Date (Custom Date Picker)
                 _buildDatePickerField("Expires on", _expiryDateController),
@@ -302,6 +340,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                     btnText: "+ Add this item",
                     btnBackground: AppColors.main,
                     borderRadius: 8,
+
                     /// here we add items
                     onPressed: _saveItem,
                   ),
@@ -331,7 +370,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
             Text(label, style: myTextStyle15(fontWeight: FontWeight.w500)),
             Expanded(
               child: TextField(
-                style: myTextStyle18(fontColor: Colors.green , fontWeight: FontWeight.bold),
+                style: myTextStyle18(
+                  fontColor: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
                 autofocus: false,
                 controller: controller,
                 textAlign: TextAlign.end,
@@ -369,7 +411,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 children: [
                   Text(
                     controller.text.isEmpty ? "Select date" : controller.text,
-                    style: myTextStyle15(fontColor: Colors.green , fontWeight: FontWeight.bold),
+                    style: myTextStyle15(
+                      fontColor: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
@@ -719,10 +764,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
     final box = await Hive.openBox<Item>('items');
     await box.add(item);
 
+    /// ✅ Schedule notification for newly added item
+    scheduleNotificationForItem(item);
+
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Item added successfully')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Item added successfully')));
       Navigator.pop(context);
     }
   }
