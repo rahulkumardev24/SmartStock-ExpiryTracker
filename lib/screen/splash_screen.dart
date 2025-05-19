@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/custom_text_style.dart';
 import 'dash_board_screen.dart';
 import 'get_start_screen.dart';
-
-
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,35 +16,47 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
+  bool isVisible = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Logo Scale Animation
+    /// Logo Scale Animation
     _controller = AnimationController(
       duration: Duration(seconds: 2),
       vsync: this,
     )..forward();
 
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    /// Animate Lottie visibility after 500ms
+    Future.delayed(Duration(milliseconds: 700), () {
+      setState(() {
+        isVisible = true;
+      });
+    });
 
-    // Navigate to HomeScreen after delay
-    Timer(Duration(seconds: 3), () {
-
+    /// Navigate to HomeScreen after delay
+    Timer(Duration(seconds: 2), () {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       checkName();
-
     });
   }
 
   Future<void> checkName() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance() ;
-    final getName = preferences.get("name") ;
-    if(getName == null){
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> GetStartedScreen()));
-    }else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> DashBoardScreen(userName:getName.toString()))) ;
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final getName = preferences.get("name");
+    if (getName == null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => GetStartedScreen()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashBoardScreen(userName: getName.toString()),
+        ),
+      );
     }
   }
 
@@ -54,6 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,9 +75,10 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             SizedBox(height: 80),
 
-            // Animated Logo
-            ScaleTransition(
-              scale: _animation,
+            /// Animated Logo
+            AnimatedOpacity(
+              opacity: isVisible ? 1.0 : 0.0,
+              duration: Duration(seconds: 1),
               child: Lottie.asset('assets/lottie/clock.json', height: 180),
             ),
 
@@ -79,10 +92,10 @@ class _SplashScreenState extends State<SplashScreen>
                 return Opacity(opacity: opacity, child: child);
               },
               child: Text(
-                "SmartStock",
+                "SmartExpiry Tracker",
                 style: myTextStyle24(
                   fontWeight: FontWeight.bold,
-                  fontFamily: "secondary"
+                  fontFamily: "secondary",
                 ),
               ),
             ),
@@ -119,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                 style: myTextStyle18(
                   fontWeight: FontWeight.bold,
                   fontColor: Colors.black54,
-                  fontFamily: "secondary"
+                  fontFamily: "secondary",
                 ),
               ),
             ),

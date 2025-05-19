@@ -55,42 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// --- notification --- ///
-  /*
-  void scheduleNotificationsForExpiringItems() async {
-    final box = Hive.box<Item>('items');
-    final now = DateTime.now();
-
-    for (var item in box.values) {
-      final daysLeft = AppUtils.getDaysLeft(item.expiryDate);
-
-      /// Sirf wahi items jinme 0 se 3 din bache hain
-      if (daysLeft >= 0 && daysLeft <= 3) {
-        final scheduledTime = DateTime(now.year, now.month, now.day, 16 , 18);
-
-        if (scheduledTime.isAfter(now)) {
-          String body;
-          if (daysLeft == 0) {
-            body = '${item.itemName} expires today!';
-          } else if (daysLeft == 1) {
-            body = '${item.itemName} is expiring tomorrow!';
-          } else {
-            body = '${item.itemName} is expiring in $daysLeft days!';
-          }
-          await NotificationService.scheduleNotification(
-            id: '${item.itemName}_$daysLeft'.hashCode,
-            title: '⚠️ Expiry Alert: ${item.itemName}',
-            body: body,
-            scheduledDateTime: scheduledTime,
-          );
-
-          print(
-            '✅ Scheduled [$daysLeft days left] notification for ${item.itemName} at $scheduledTime',
-          );
-        }
-      }
-    }
-  }
-*/
 
   DateTime _parseExpiryDate(String expiryDate) {
     try {
@@ -134,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           await NotificationService.scheduleDailyNotifications(
             id: item.itemName.hashCode,
-            title: '⚠️ Expiry Alert: ${item.itemName}',
+            title: '🔔 Expiry Alert: ${item.itemName}',
             body: 'Your ${item.itemName} is expiring soon!',
             firstNotificationDate: notificationTime,
             daysUntilExpiry: daysLeft,

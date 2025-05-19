@@ -16,6 +16,10 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  /// show in full screen
+SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+
   /// for hive database
   await Hive.initFlutter();
   Hive.registerAdapter(ItemAdapter());

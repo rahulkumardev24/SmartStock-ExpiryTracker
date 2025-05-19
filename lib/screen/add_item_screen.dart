@@ -454,7 +454,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16),
-          height: MediaQuery.of(context).size.height * 0.35,
+          height: MediaQuery.of(context).size.height * 0.4,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -542,6 +542,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   ),
                 ],
               ),
+              SizedBox(height : MediaQuery.of(context).size.height * 0.05)
             ],
           ),
         );
@@ -760,14 +761,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
             now.day,
             10,
             0,
-          ); // सुबह 10 बजे
+          );
           if (notificationTime.isBefore(now)) {
             notificationTime = notificationTime.add(Duration(days: 1));
           }
 
           await NotificationService.scheduleDailyNotifications(
             id: item.itemName.hashCode,
-            title: '⚠️ Expiry Alert: ${item.itemName}',
+            title: '🔔 Expiry Alert: ${item.itemName}',
             body:
                 'Your ${item.itemName} is expiring ${daysLeft == 0 ? 'today' : 'in $daysLeft days'}!',
             firstNotificationDate: notificationTime,
@@ -775,7 +776,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
           );
         }
       } catch (e) {
-        debugPrint('Error scheduling notification for new item: $e');
+        print('Error scheduling notification for new item: $e');
       }
 
       // Calculate days until expiry
@@ -804,7 +805,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
         if (daysLeft <= 3) {
           await NotificationService.scheduleDailyNotifications(
             id: item.itemName.hashCode,
-            title: '⚠️ Expiry Alert: ${item.itemName}',
+            title: '🔔 Expiry Alert: ${item.itemName}',
             body:
                 'Your ${item.itemName} will expire in $daysLeft day${daysLeft == 1 ? '' : 's'}',
             firstNotificationDate: firstNotificationTime,
@@ -830,7 +831,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
           labelTextColor: Colors.black54,
         ).show(context);
       }
-      debugPrint('Error saving item: $e');
+      print('Error saving item: $e');
     }
   }
 
