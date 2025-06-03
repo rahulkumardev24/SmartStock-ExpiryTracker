@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 import '../utils/colors.dart';
 import '../utils/custom_text_style.dart';
 import 'add_item_screen.dart';
@@ -25,10 +24,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   void initState() {
     super.initState();
-    _screens = [
-      HomeScreen(userName: widget.userName),
-      CategoryScreen(),
-    ];
+    _screens = [HomeScreen(userName: widget.userName), CategoryScreen()];
   }
 
   /// Function to change tab
@@ -38,14 +34,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final mqHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: _screens[_selectedIndex], // Display selected screen
-
       /// Floating Action Button (FAB)
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -59,14 +53,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         shape: const CircleBorder(),
         child: const FaIcon(FontAwesomeIcons.plus, color: Colors.white),
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       /// Custom Bottom Navigation Bar
       bottomNavigationBar: BottomAppBar(
+        padding: EdgeInsets.zero,
+        notchMargin: mqHeight * 0.01,
+        elevation: 0,
         height: mqHeight * 0.09,
-        shape: const CircularNotchedRectangle(),
+        shape: CircularNotchedRectangle(),
         color: AppColors.light,
-
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -75,6 +72,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               onTap: () => _onItemTapped(0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.home_filled,
@@ -83,24 +81,31 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   Text(
                     "Home",
                     style: myTextStyle15(
-                      fontColor: _selectedIndex == 0 ? Colors.green : Colors.black54,
-                      fontWeight: _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
+                      fontColor:
+                          _selectedIndex == 0 ? Colors.green : Colors.black54,
+                      fontWeight:
+                          _selectedIndex == 0
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                     ),
                   ),
                 ],
               ),
             ),
 
-            /// Add Item (Centered)
+            /// Empty column to center the FAB label
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 20), // Space to align with FAB
-                Text(
-                  "Add Item",
-                  style: myTextStyle15(
-                    fontWeight: FontWeight.bold,
-                    fontColor: Colors.black54,
+                SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  child: Text(
+                    "Add Item",
+                    style: myTextStyle15(
+                      fontWeight: FontWeight.bold,
+                      fontColor: Colors.black54,
+                    ),
                   ),
                 ),
               ],
@@ -111,6 +116,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               onTap: () => _onItemTapped(1),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   FaIcon(
                     FontAwesomeIcons.layerGroup,
@@ -119,8 +125,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   Text(
                     "Category",
                     style: myTextStyle15(
-                      fontColor: _selectedIndex == 1 ? Colors.green : Colors.black54,
-                      fontWeight: _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
+                      fontColor:
+                          _selectedIndex == 1 ? Colors.green : Colors.black54,
+                      fontWeight:
+                          _selectedIndex == 1
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                     ),
                   ),
                 ],

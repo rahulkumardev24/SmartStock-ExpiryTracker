@@ -381,6 +381,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(height: mqHeight * 0.2),
+
+                        /// --- add icon ---- ////
                         FaIcon(
                           FontAwesomeIcons.boxOpen,
                           size: 64,
@@ -388,9 +390,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
 
                         Text(
-                          'No items found',
+                          'No items added yet',
                           style: myTextStyle18(
                             fontColor: AppColors.main.withAlpha(100),
+                          ),
+                        ),
+
+                        Text(
+                          'Click on the Add Item button to Add item',
+                          style: myTextStyle12(
+                            fontColor: Colors.black45,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
