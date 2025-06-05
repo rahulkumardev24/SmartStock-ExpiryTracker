@@ -14,7 +14,7 @@ class MyNavigationButton extends StatefulWidget {
     required this.btnIcon ,
     required this.onPressed ,
     this.iconSize = 18 ,
-    this.btnRadius = 21 ,
+    this.btnRadius = 16.0 ,
     this.heorTag,
   });
 
@@ -28,7 +28,7 @@ class _MyNavigationButtonState extends State<MyNavigationButton> {
     return FloatingActionButton(
       heroTag: widget.heorTag,
       onPressed: widget.onPressed ,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(widget.btnRadius!)),
       elevation:0,
       backgroundColor: widget.btnBackground,
       child:Icon(widget.btnIcon , size:widget.iconSize,),);

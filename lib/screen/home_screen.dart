@@ -1,3 +1,4 @@
+import 'package:SmartExpiryTracker/helper/my_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -191,9 +192,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 });
               },
-              iconSize: 21,
-              btnRadius: 100,
-              btnBackground: Colors.black12.withAlpha(20),
+              iconSize: mqWidth * 0.05,
+              btnRadius: mqWidth * 0.03,
+              btnBackground: AppColors.primary,
             ),
           ),
           SizedBox(width: 12),
@@ -211,6 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: mqWidth * 0.11,
                     child: MyNavigationButton(
                       heorTag: 100,
+
                       btnIcon: FontAwesomeIcons.bell,
                       onPressed: () {
                         Navigator.push(
@@ -220,8 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      iconSize: 21,
-                      btnRadius: 100,
+                      iconSize: mqWidth * 0.05,
+                      btnRadius: mqWidth * 0.03,
                       btnBackground: AppColors.primary,
                     ),
                   ),
@@ -234,6 +236,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               );
             },
+          ),
+          SizedBox(width: 12),
+
+          SizedBox(
+            width: mqWidth * 0.11,
+            height: mqWidth * 0.11,
+            child: MyNavigationButton(
+              btnIcon: Icons.share_rounded,
+              onPressed: () => MyDialogs.shareApp(context),
+              iconSize: mqWidth * 0.05,
+              btnRadius: mqWidth * 0.03,
+              btnBackground: AppColors.primary,
+            ),
           ),
           SizedBox(width: 12),
         ],
